@@ -1,0 +1,29 @@
+---
+title: |
+  \vspace{1cm}
+  \begin{tabular}{c}
+  {\normalsize\textbf{UNIVERSIDAD NACIONAL DE ROSARIO}}\\
+  {\Large Facultad de Ciencias Económicas y Estadística}\\
+  \\
+  \\
+  \includegraphics[width=5cm]{LogoUNR.png}\\
+  \\
+  \\
+  {\huge\textbf{Análisis de temperatura corporal postmortem}}\\
+  {\huge\textbf{utilizando modelos lineales bayesianos}}\\
+  \\
+  {\Large Estadística Bayesiana - Trabajo Práctico Nº3}\\
+  \end{tabular}
+  \vspace{4cm}
+author: |
+  Alumnas: Agustina Mac Kay, Ailén Salas y Rocío Canteros
+date: "Año 2024"
+output: pdf_document
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include=FALSE, eval=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
