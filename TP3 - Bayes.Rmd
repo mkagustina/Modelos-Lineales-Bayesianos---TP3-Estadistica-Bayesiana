@@ -27,3 +27,29 @@ editor_options:
 ```{r setup, include=FALSE, eval=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# Introducción
+
+La tanatocronología, derivada de las palabras griegas "thanatos" (muerte) y "chronos" (tiempo), es un subcampo de la medicina forense que se centra en determinar el intervalo postmortem, es decir, el tiempo transcurrido desde la muerte hasta el descubrimiento del cadáver.[^1]
+
+[^1]: Fuente: [\textcolor{blue}{\underline{Diccionario Médico: tanatocronología - Clínica Universidad de Navarra}}](https://www.cun.es/diccionario-medico/terminos/tanatocronologia#:~:text=La%20tanatocronolog%C3%ADa%2C%20derivada%20de%20las,hasta%20el%20descubrimiento%20del%20cad%C3%A1ver.)
+
+Desde el momento de la muerte, comienza en el cuerpo humano una serie de procesos químicos y físicos que se conocen como fenómenos cadavéricos. Uno de ellos es el enfriamiento del cuerpo (enfriamiento postmortem o *algor mortis*). En este proceso, la temperatura del cadáver desciende hasta igualarse con la temperatura ambiente. Este descenso ocurre más rápido en las primeras horas después de la muerte.
+
+El objetivo de este trabajo es averiguar la hora de muerte de Sergio Contreras, un hombre que fue hallado muerto sobre un charco de sangre en su casa en la localidad cordobesa de Salsipuedes. Para resolver este acertijo, se cuenta con la siguiente información sobre la temperatura corporal del cuerpo del hombre:
+
+* Dato relevante 1
+* Dato relevante 2
+* Dato relevante 3
+* ...
+
+# Sección con nombre ????
+
+Como el ritmo con el cual el cuerpo pierde temperatura no es constante, se puede pensar que la derivada de la temperatura respecto al tiempo varía con el tiempo. En este caso, la temperatura del cadáver satisface la siguiente ley: 
+
+$$ \frac{dT(t)}{dt} = r[T_{\text{amb}}-T(t)] $$
+donde \(T_{\text{amb}}\) es la temperatura ambiente (un valor fijo y conocido), \(r\) es una constante y \(T(t)\) es la función (por ahora desconocida) que describe la temperatura del cuerpo en función del tiempo.
+
+Una función que satisface la ecuación, es decir, cuya derivada cambia con el valor que toma la función, es: 
+
+$$ T(t)=T_{\text{amb}} + (T_i - T_{\text{amb}})* e^{-rt} $$
+siendo \(T_i\) la temperatura a la que está inicialmente el cuerpo.
