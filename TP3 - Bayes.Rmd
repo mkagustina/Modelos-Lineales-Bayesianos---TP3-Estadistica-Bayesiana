@@ -53,3 +53,47 @@ Una función que satisface la ecuación, es decir, cuya derivada cambia con el v
 
 $$ T(t)=T_{\text{amb}} + (T_i - T_{\text{amb}})* e^{-rt} $$
 siendo \(T_i\) la temperatura a la que está inicialmente el cuerpo.
+ Verificacion:
+$$ \frac{dT(t)}{dt} = (T_i - T_{\text{amb}}).  (-r).  e^{-rt} = $$
+$$ = (T_i - T_{\text{amb}})  .(-r).  e^{-rt} -r.T_{amb}+r.T_{amb} = $$
+
+$$ = -r . T(t) + r.T_{amb} = r.[T_{amb}-T(t)]$$
+ 
+```{r}
+
+library(ggplot2)
+library(dplyr)
+# Graficfo de tiempo
+
+t_amb <- 23
+t_i <- 37
+t <- seq(1, 24, by = 1)
+r <- c(0.1, 0.3)
+
+funcion_t <- function(t_amb, t_i, t, r) {
+  t_amb + (t_i- t_amb) * exp(-r*t)
+}
+funcion_t_vector <- Vectorize(funcion_t)
+
+df_T <- data.frame(
+  t_amb = t_amb,
+  t_i = t_i,
+  t = rep(seq(t), times = length(r)),
+  r = rep(r, each = length(t))
+)
+
+
+df_T <- df_T %>% 
+  mutate(func_t = funcion_t_vector(df_T$t_amb, df_T$t_i, df_T$t, df_T$r))
+
+ggplot(df_T) +
+  geom_line(aes(x = t, y = func_t, color = factor(r))) +
+  theme_bw() 
+
+```
+*r* es una constante que representa la conductividad entre el cuerpo y la superficie de contacto, por lo que un conjunto de valores razonables sería entre 0.05 y 0.2 -ver información que tiene Agus-
+
+Demostración de logaritmo
+$$ ln(T(t) - T_{amb}) = ln( T_{diff} . e^{-rt}) = ln(T_{diff}) + (-rt) = $$
+$$ = ln(T_{diff}) - rt = \beta_{0} + \beta_{1}t $$
+donde $$ \beta_{0} $$ sería el logaritmo de la diferencia entre ... y $$ \beta_{1} $$ es cuanto va cambiando el logaritmo de la temperatura corporal menos la temperatura del ambiente por cada hora que transcurre Por este motivo es la constante de conductividad
