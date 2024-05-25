@@ -24,8 +24,8 @@ editor_options:
     wrap: sentence
 ---
 
-```{r setup, include=FALSE, eval=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 ```
 # Introducción
 
@@ -46,19 +46,21 @@ El objetivo de este trabajo es averiguar la hora de muerte de Sergio Contreras, 
 
 Como el ritmo con el cual el cuerpo pierde temperatura no es constante, se puede pensar que la derivada de la temperatura respecto al tiempo varía con el tiempo. En este caso, la temperatura del cadáver satisface la siguiente ley: 
 
-$$ \frac{dT(t)}{dt} = r[T_{\text{amb}}-T(t)] $$
+$$ \frac{dT(t)}{dt} = r[T_{\text{amb}}-T(t)] \tag{1} $$
 donde \(T_{\text{amb}}\) es la temperatura ambiente (un valor fijo y conocido), \(r\) es una constante y \(T(t)\) es la función (por ahora desconocida) que describe la temperatura del cuerpo en función del tiempo.
 
-Una función que satisface la ecuación, es decir, cuya derivada cambia con el valor que toma la función, es: 
+Una posible función \(T(t)\) es: 
 
 $$ T(t)=T_{\text{amb}} + (T_i - T_{\text{amb}})* e^{-rt} $$
-siendo \(T_i\) la temperatura a la que está inicialmente el cuerpo.
- Verificacion:
-$$ \frac{dT(t)}{dt} = (T_i - T_{\text{amb}}).  (-r).  e^{-rt} = $$
-$$ = (T_i - T_{\text{amb}})  .(-r).  e^{-rt} -r.T_{amb}+r.T_{amb} = $$
+siendo \(T_i\) la temperatura a la que está inicialmente el cuerpo. 
 
-$$ = -r . T(t) + r.T_{amb} = r.[T_{amb}-T(t)]$$
- 
+La misma satisface la ecuación \((1)\) ya que:
+
+$$ \frac{dT(t)}{dt} = (T_i - T_{\text{amb}}).  (-r).  e^{-rt} = $$
+$$ = -r . [(T_i - T_{amb}) . e^{-rt}] = $$
+$$ = -r . [-T_{amb}+T_{amb}+(T_i - T_{amb}) . e^{-rt}] = $$
+$$ = -r . [-T_{amb}+T(t)] = $$
+ $$ = r.[T(t) - T_{amb}] $$
 ```{r}
 
 library(ggplot2)
