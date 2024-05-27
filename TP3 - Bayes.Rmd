@@ -70,7 +70,7 @@ library(dplyr)
 t_amb <- 23
 t_i <- 37
 t <- seq(1, 40, by = 1)
-r <- c(0.1, 0.3)
+r <- c(0.1, 0.12, 0.15, 0.2, 0.3)
 
 funcion_t <- function(t_amb, t_i, t, r) {
   t_amb + (t_i- t_amb) * exp(-r*t)
@@ -92,13 +92,16 @@ ggplot(df_T) +
   geom_line(aes(x = t, y = func_t, color = factor(r)), linewidth = 1.2) +
   scale_x_continuous(breaks = seq(0, 40, by = 5), name = "Hora (t)") +
   scale_y_continuous(breaks = seq(23, 37, by = 2), name = "T(t)") +
-  scale_color_manual(values = c("orchid3", "palegreen3"), name = "r") +
+  scale_color_manual(values = c("orchid3", "palegreen3", 'hotpink', 'gold3', 'firebrick3'), name = "r") +
   geom_hline(yintercept = 23, linetype = "dashed") +
   labs(caption = "Figura 1: Gráfica de la función de descenso de la temperatura corporal T(t) para 2 valores de la constante r,\n con una temperatura inicial del cuerpo de 37 Cº hasta alcanzar una temperatura ambiente de 23 Cº") +
   theme_bw() +
   theme(plot.caption = element_text(hjust = 0.5))
 ```
-*r* es una constante que representa la conductividad entre el cuerpo y la superficie de contacto, por lo que un conjunto de valores razonables sería entre 0.05 y 0.2 -ver información que tiene Agus-
+*r* es una constante que representa la conductividad entre el cuerpo y la superficie de contacto, por lo que un conjunto de valores razonables sería entre 0.05 y 0.2 .
+
+Los órganos abdominales pueden mantener el calor por al menos 24 horas. En las primeras 12 horas se va perdiendo el calor de 0.8 a 1.0 grado centígrado por hora y en las siguientes 12 horas de 0.3 a 0.5 grados centígrados
+# Poner fuente
 
 Demostración de logaritmo
 $$ ln(T(t) - T_{amb}) = ln( T_{diff} . e^{-rt}) = ln(T_{diff}) + (-rt) = $$
