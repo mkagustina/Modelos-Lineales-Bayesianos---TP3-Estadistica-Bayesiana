@@ -103,7 +103,18 @@ ggplot(df_T) +
 Los órganos abdominales pueden mantener el calor por al menos 24 horas. En las primeras 12 horas se va perdiendo el calor de 0.8 a 1.0 grado centígrado por hora y en las siguientes 12 horas de 0.3 a 0.5 grados centígrados
 # Poner fuente
 
+
+Ahora bien, para mayor simplicidad a la hora de modelizar se decide trabajar con la diferencia entre la temperatura del cuerpo y la temperatura ambiente $T - T_{amb}$ y se define $T_{diff} = T_i - T_{amb}$; por lo que se obtiene finalmente que $T(t) - T_{amb} = T_{diff} . e ^ {-rt}$. 
+¿Dónde participa la Estadística Bayesiana en todo esto? Al igual que en los temas previamente trabajados, se deben definir una verosimilitud y priors. 
+
+$$
+\begin {cases} 
+T(t) - T_{amb} \sim N_{(\mu, \sigma)} \\
+\mu = ln(T(t) - T_{amb})
+\end{cases}
+
+$$
 Demostración de logaritmo
 $$ ln(T(t) - T_{amb}) = ln( T_{diff} . e^{-rt}) = ln(T_{diff}) + (-rt) = $$
 $$ = ln(T_{diff}) - rt = \beta_{0} + \beta_{1}t $$
-donde $$ \beta_{0} $$ sería el logaritmo de la diferencia entre ... y $$ \beta_{1} $$ es cuanto va cambiando el logaritmo de la temperatura corporal menos la temperatura del ambiente por cada hora que transcurre Por este motivo es la constante de conductividad
+donde $$ \beta_{0} $$ sería el logaritmo de la diferencia entre la función $T$ y la temperatura ambiente cuando $t=0$ (si se exponencia a ambos lados se obtiene que $ T(t=0) - T_{amb} = e^{\beta_0}= e^{ln(T_{diff})} = T_i - T_{amb} \rightarrow T(0) = T_i$) y $$ \beta_{1} $$ es cuánto va cambiando el logaritmo de la diferencia entre la temperatura corporal y la temperatura del ambiente por cada hora que transcurre. Por este motivo es la constante de conductividad
