@@ -61,7 +61,7 @@ $$ \frac{dT(t)}{dt} = (T_i - T_{\text{amb}}).  (-r).  e^{-rt} = $$
 $$ = -r . [(T_i - T_{amb}) . e^{-rt}] = $$
 $$ = -r . [-T_{amb}+T_{amb}+(T_i - T_{amb}) . e^{-rt}] = $$
 $$ = -r . [-T_{amb}+T(t)] = $$
- $$ = r.[T(t) - T_{amb}] $$
+ $$ = r.[T_{amb} - T(t)] $$
 ```{r}
 library(ggplot2)
 library(dplyr)
