@@ -1,5 +1,7 @@
 data {
   int<lower=0> N;
+  vector[N] t;
+  vector[N] temp_obs;
   vector[N] y;
 }
 

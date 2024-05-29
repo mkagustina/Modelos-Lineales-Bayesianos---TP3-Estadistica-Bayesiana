@@ -65,6 +65,8 @@ $$ = -r . [-T_{amb}+T(t)] = $$
 ```{r}
 library(ggplot2)
 library(dplyr)
+library(kableExtra)
+library(rstan)
 
 # Gráfico de tiempo
 t_amb <- 23
@@ -109,8 +111,8 @@ Ahora bien, para mayor simplicidad a la hora de modelizar se decide trabajar con
 
 $$
 \begin {cases} 
-T(t) - T_{amb} \sim N_{(\mu, \sigma)} \\
-\mu = ln(T(t) - T_{amb})
+ln(T(t) - T_{amb}) \sim N_{(\mu, \sigma)} \\
+\mu = \beta_{0} + \beta_{1}t
 \end{cases}
 
 $$
@@ -136,3 +138,40 @@ $$
 \sigma \sim N_{(6.5)}
 \end {cases}
 $$
+#Punto 5: leer el repo de las diapositivas de clases.(presentaciones -> presentacion_06 -> linea 401 a linea 425)
+
+
+
+#Lo de abajo creo que sirve para el punto 6 en adelante----------
+
+
+Teniendo en cuenta la información cronológica presentada al inicio del trabajo, se presenta la tabla 1 (por ponerle un número). Se considera como $t = 0$ al horario en el que se le registra la temperatura por primera vez al cuerpo de Sergio (6:45hs), mientras que los demás tiempos son la diferencia, en minutos, entre esa hora y la hora en la que se tomán las restantes temperaturas (8:15hs y 13:30hs).
+```{r}
+#Se arma una tabla con las temperaturas del cuerpo observadas y los tiempo
+datos <- data.frame(
+  t = c(0, 90, 405),
+  temp = c(32.8, 30.5, 23.7)
+)
+
+kable(datos)
+
+t_amb <- 22
+temp_obs <- datos$temp
+stan_data <- list(
+  N = 3,
+  t = datos$t,
+  temp_obs = temp_obs,
+  y = log(temp_obs - t_amb)
+)
+
+stan_model <- stan(
+  file = "modelo.stan",
+  chains = 4,
+  data = stan_data,
+  refresh = 1,
+  seed = 
+)
+
+
+```
+
