@@ -64,17 +64,17 @@ donde \(T_{\text{amb}}\) es la temperatura ambiente (un valor fijo y conocido), 
 
 Una posible función \(T(t)\) es: 
 
-$$ T(t)=T_{\text{amb}} + (T_i - T_{\text{amb}})* e^{-rt} $$
+$$ T(t)=T_{\text{amb}} + (T_i - T_{\text{amb}}) \cdot e^{-rt} $$
 siendo \(T_i\) la temperatura a la que está inicialmente el cuerpo. 
 
 La misma satisface la ecuación \((1)\) ya que:
 
-$$ \frac{dT(t)}{dt} = (T_i - T_{\text{amb}}).  (-r).  e^{-rt} = $$
-$$ = -r . [(T_i - T_{amb}) . e^{-rt}] = $$
-$$ = -r . [-T_{amb}+T_{amb}+(T_i - T_{amb}) . e^{-rt}] = $$
-$$ = -r . [-T_{amb}+T(t)] = $$
-$$ = r.[T_{amb} - T(t)] $$
-Se grafica a continuación la función $T(t)$ para distintos valores de la constante $r$.
+$$ \frac{dT(t)}{dt} = (T_i - T_{\text{amb}}) \cdot (-r) \cdot e^{-rt} = $$
+$$ = -r \cdot [(T_i - T_{amb}) \cdot e^{-rt}] = $$
+$$ = -r \cdot [-T_{amb}+T_{amb}+(T_i - T_{amb}) \cdot e^{-rt}] = $$
+$$ = -r \cdot [-T_{amb}+T(t)] = $$
+$$ = r \cdot [T_{amb} - T(t)] $$
+Se grafica a continuación la función $T(t)$ para distintos valores de la constante $r$, considerando una temperatura inicial del cuerpo de 37 Cº y una temperatura ambiente de 23 Cº.
 
 ```{r}
 # Gráfico de la temperatura del cuerpo a través del tiempo
@@ -118,7 +118,7 @@ Los órganos abdominales pueden mantener el calor por al menos 24 horas. En las 
 
 Teniendo en cuenta esta información y lo observado en la Figura 1, se puede considerar que un valor razonable para *r* se encuentra entre 0.1 y 0.2.
 
-Ahora bien, para mayor simplicidad a la hora de modelizar se decide trabajar con la diferencia entre la temperatura del cuerpo y la temperatura ambiente $T - T_{amb}$ y se define $T_{diff} = T_i - T_{amb}$; por lo que se obtiene finalmente que $T(t) - T_{amb} = T_{diff} . e ^ {-rt}$. 
+Ahora bien, para mayor simplicidad a la hora de modelizar se decide trabajar con la diferencia entre la temperatura del cuerpo y la temperatura ambiente $T - T_{amb}$ y se define $T_{diff} = T_i - T_{amb}$; por lo que se obtiene finalmente que $T(t) - T_{amb} = T_{diff} \cdot e ^ {-rt}$. 
 ¿Dónde participa la Estadística Bayesiana en todo esto? Al igual que en los temas previamente trabajados, se deben definir una verosimilitud y priors. 
 
 $$
@@ -130,8 +130,8 @@ $$
 
 
 Demostración de logaritmo
-$$ ln(T(t) - T_{amb}) = ln( T_{diff} . e^{-rt}) = ln(T_{diff}) + (-rt) = $$
-$$ = ln(T_{diff}) - rt = \beta_{0} + \beta_{1}t $$
+$$ ln(T(t) - T_{amb}) = ln( T_{diff} \cdot e^{-rt}) = ln(T_{diff}) + (-rt) = $$
+$$ = ln(T_{diff}) - rt = \beta_{0} + \beta_{1}\cdot t $$
 donde $$ \beta_{0} $$ sería el logaritmo de la diferencia entre la función $T$ y la temperatura ambiente cuando $t=0$ (si se exponencia a ambos lados se obtiene que $$ T(t=0) - T_{amb} = e^{\beta_0}= e^{ln(T_{diff})} = T_i - T_{amb} \Longrightarrow T(0) = T_i$$) y $$ \beta_{1} $$ es cuánto va cambiando el logaritmo de la diferencia entre la temperatura corporal y la temperatura del ambiente por cada hora que transcurre. Por este motivo es la constante de conductividad
 
 
