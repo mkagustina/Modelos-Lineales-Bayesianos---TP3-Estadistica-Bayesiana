@@ -58,22 +58,19 @@ El objetivo de este trabajo es averiguar la hora de muerte de Sergio Contreras, 
 # Sección con nombre ????
 
 Como el ritmo con el cual el cuerpo pierde temperatura no es constante, se puede pensar que la derivada de la temperatura respecto al tiempo varía con el tiempo. En este caso, la temperatura del cadáver satisface la siguiente ley: 
-
 $$ \frac{dT(t)}{dt} = r[T_{\text{amb}}-T(t)] \tag{1} $$
 donde \(T_{\text{amb}}\) es la temperatura ambiente (un valor fijo y conocido), \(r\) es una constante y \(T(t)\) es la función (por ahora desconocida) que describe la temperatura del cuerpo en función del tiempo.
 
 Una posible función \(T(t)\) es: 
-
 $$ T(t)=T_{\text{amb}} + (T_i - T_{\text{amb}}) \cdot e^{-rt} $$
 siendo \(T_i\) la temperatura a la que está inicialmente el cuerpo. 
 
 La misma satisface la ecuación \((1)\) ya que:
-
 $$ \frac{dT(t)}{dt} = (T_i - T_{\text{amb}}) \cdot (-r) \cdot e^{-rt} = $$
-$$ = -r \cdot [(T_i - T_{amb}) \cdot e^{-rt}] = $$
-$$ = -r \cdot [-T_{amb}+T_{amb}+(T_i - T_{amb}) \cdot e^{-rt}] = $$
-$$ = -r \cdot [-T_{amb}+T(t)] = $$
-$$ = r \cdot [T_{amb} - T(t)] $$
+$$ = -r \cdot [(T_i - T_{\mathrm{amb}}) \cdot e^{-rt}] = $$
+$$ = -r \cdot [-T_{\mathrm{amb}}+T_{\mathrm{amb}}+(T_i - T_{\mathrm{amb}}) \cdot e^{-rt}] = $$
+$$ = -r \cdot [-T_{\mathrm{amb}}+T(t)] = $$
+$$ = r \cdot [T_{\mathrm{amb}} - T(t)] $$
 Se grafica a continuación la función $T(t)$ para distintos valores de la constante $r$, considerando una temperatura inicial del cuerpo de 37 Cº y una temperatura ambiente de 23 Cº.
 
 ```{r}
@@ -118,28 +115,29 @@ Los órganos abdominales pueden mantener el calor por al menos 24 horas. En las 
 
 Teniendo en cuenta esta información y lo observado en la Figura 1, se puede considerar que un valor razonable para *r* se encuentra entre 0.1 y 0.2.
 
-Ahora bien, para mayor simplicidad a la hora de modelizar se decide trabajar con la diferencia entre la temperatura del cuerpo y la temperatura ambiente $T - T_{amb}$ y se define $T_{diff} = T_i - T_{amb}$; por lo que se obtiene finalmente que $T(t) - T_{amb} = T_{diff} \cdot e ^ {-rt}$. 
+Para mayor simplicidad a la hora de contruir un modelo, en lugar de trabajar con la temperatura del cuerpo se decide utilizar la diferencia entre la temperatura del mismo y la temperatura ambiente $T(t) - T_{\mathrm{amb}}$. Además, se define $T_{\mathrm{diff}} = T_i - T_{\mathrm{amb}}$; por lo que se obtiene finalmente que $T(t) - T_{\mathrm{amb}} = T_{\mathrm{diff}} \cdot e ^ {-rt}$.
+
+Se demuestra a continuación un resultado que será de vital importancia para la construcción de un modelo: el logaritmo natural de la nueva variable $T(t) - T_{\mathrm{amb}}$ es una función lineal de *t*.
+
+$$ \ln(T(t) - T_{\mathrm{amb}}) = \ln( T_{\mathrm{diff}} \cdot e^{-rt}) = \ln(T_{\mathrm{diff}}) + (-rt) \cdot \ln (e) = $$
+$$ = \ln(T_{\mathrm{diff}}) - rt = \beta_{0} + \beta_{1}\cdot t $$
+donde $\beta_{0}$ sería el logaritmo de la diferencia entre la función $T$ y la temperatura ambiente cuando $t=0$ (si se exponencia a ambos lados se obtiene que $$ T(t=0) - T_{\mathrm{amb}} = e^{\beta_0}= e^{ln(T_{\mathrm{diff}})} = T_i - T_{\mathrm{amb}} \Longrightarrow T(0) = T_i$$) y $\beta_{1}$ es cuánto va cambiando el logaritmo de la diferencia entre la temperatura corporal y la temperatura del ambiente por cada hora que transcurre. Por este motivo es la constante de conductividad.
+
 ¿Dónde participa la Estadística Bayesiana en todo esto? Al igual que en los temas previamente trabajados, se deben definir una verosimilitud y priors. 
 
 $$
 \begin{cases} 
-ln(T(t) - T_{amb}) \sim N_{(\mu, \sigma)} \\
+ln(T(t) - T_{\mathrm{amb}}) \sim N_{(\mu, \sigma)} \\
 \mu = \beta_{0} + \beta_{1}t
 \end{cases}
 $$
 
 
-Demostración de logaritmo
-$$ ln(T(t) - T_{amb}) = ln( T_{diff} \cdot e^{-rt}) = ln(T_{diff}) + (-rt) = $$
-$$ = ln(T_{diff}) - rt = \beta_{0} + \beta_{1}\cdot t $$
-donde $$ \beta_{0} $$ sería el logaritmo de la diferencia entre la función $T$ y la temperatura ambiente cuando $t=0$ (si se exponencia a ambos lados se obtiene que $$ T(t=0) - T_{amb} = e^{\beta_0}= e^{ln(T_{diff})} = T_i - T_{amb} \Longrightarrow T(0) = T_i$$) y $$ \beta_{1} $$ es cuánto va cambiando el logaritmo de la diferencia entre la temperatura corporal y la temperatura del ambiente por cada hora que transcurre. Por este motivo es la constante de conductividad
-
-
 Dado que $\beta_0$, $\beta_1$ y $\sigma$ serán las variables aletorias, las distribuciones a priori se definen sobre ellas. 
-Para la de la ordenada al origen ($\beta_0$), se considerará una temperatura ambiente minima de -2° y una máxima de 33° junto con una temperatura inicial de 37° (temperatura habitual del cuerpo humano); esto daría que la diferencia máxima ocurre en el minimo de $T_{amb}$ y la minima se da en el máximo de $T_{amb}$. (min = 4, máx = 39) Como se está trabajando con $ln(T_i - T_{amb})$, el valor minimo será $ln(4) = 1.386$ y el máximo será $ln(39) = 3.664$. Dado este rango de valores, se deduce que $\mu_{\beta_0} = 2.525$ y $\sigma_{\beta_0} = 0.380$ y queda así definido su *prior*.
+Para la de la ordenada al origen ($\beta_0$), se considerará una temperatura ambiente minima de -2° y una máxima de 33° junto con una temperatura inicial de 37° (temperatura habitual del cuerpo humano); esto daría que la diferencia máxima ocurre en el minimo de $T_{\mathrm{amb}}$ y la minima se da en el máximo de $T_{\mathrm{amb}}$. (min = 4, máx = 39) Como se está trabajando con $ln(T_i - T_{\mathrm{amb}})$, el valor minimo será $ln(4) = 1.386$ y el máximo será $ln(39) = 3.664$. Dado este rango de valores, se deduce que $\mu_{\beta_0} = 2.525$ y $\sigma_{\beta_0} = 0.380$ y queda así definido su *prior*.
 Para la distribución de $\beta_1$, se considerará que *r* toma valores entre 0.05 y 0.3 (por ende $\beta_1 = -r \in (-0.3, -0.05)$ ). Con esto se obtiene que $\mu_{\beta_1} = -0.175$ y $\sigma_{\beta_1} = 0.042$.
-Ahora, $sigma$ es el desvio de la $T(t) - T_{amb}$ 
-la diferencia máxima entre $T_{amb}$ y $T(t)$ se da cuando $T(t)$ sea máxima (37°) y $T_{amb}$ sea minima (-2°), dicha diferencia en 39; y la diferencia minima se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, es decir la diferencia es 0. Por lo que el desvio de la distribucion de $\sigma$ es 6.5
+Ahora, $sigma$ es el desvio de la $T(t) - T_{\mathrm{amb}}$ 
+la diferencia máxima entre $T_{\mathrm{amb}}$ y $T(t)$ se da cuando $T(t)$ sea máxima (37°) y $T_{\mathrm{amb}}$ sea minima (-2°), dicha diferencia en 39; y la diferencia minima se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, es decir la diferencia es 0. Por lo que el desvio de la distribucion de $\sigma$ es 6.5
 
 
 $$
