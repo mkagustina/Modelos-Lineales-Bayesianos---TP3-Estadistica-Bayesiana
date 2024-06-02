@@ -121,7 +121,7 @@ Para mayor simplicidad a la hora de contruir un modelo, en lugar de trabajar con
 
 Se demuestra a continuación un resultado que será de vital importancia para la construcción de un modelo: el logaritmo natural de la nueva variable $T(t) - T_{\mathrm{amb}}$ es una función lineal de *t*.
 
-$$ \ln(T(t) - T_{\mathrm{amb}}) = \ln( T_{\mathrm{diff}} \cdot e^{-rt}) = \ln(T_{\mathrm{diff}}) + (-rt) \cdot \ln (e) = \ln(T_{\mathrm{diff}}) - rt = \beta_{0} + \beta_{1}\cdot t$$
+$$ \ln(T(t) - T_{\mathrm{amb}}) = \ln( T_{\mathrm{diff}} \cdot e^{-rt}) = \ln(T_{\mathrm{diff}}) + (-rt) \cdot \ln (e) = \ln(T_{\mathrm{diff}}) - rt = \beta_{0} + \beta_{1}\cdot (t+t_\delta)$$
 
 Se puede interpretar a $\beta_{0}$ como el valor del $\ln(T(t) - T_{\mathrm{amb}})$ cuando $t=0$, es decir, al momento de la muerte. Si se exponencian ambos miembros se obtiene que 
 $$ T(t=0) - T_{\mathrm{amb}} = e^{\beta_0}$$ 
@@ -142,38 +142,38 @@ $$
 
 
 Dado que $\beta_0$, $\beta_1$, $\sigma$ y $t_{\delta}$ serán las variables aletorias, las distribuciones a priori se definen sobre ellas. 
-Para la de la ordenada al origen ($\beta_0$), se considerará una temperatura ambiente minima de -2° y una máxima de 33° junto con una temperatura inicial de 37° (temperatura habitual del cuerpo humano); esto daría que la diferencia máxima ocurre en el minimo de $T_{\mathrm{amb}}$ y la minima se da en el máximo de $T_{\mathrm{amb}}$. (min = 4, máx = 39) Como se está trabajando con $ln(T_i - T_{\mathrm{amb}})$, el valor minimo será $ln(4) = 1.386$ y el máximo será $ln(39) = 3.664$. Dado este rango de valores, se deduce que $\mu_{\beta_0} = 2.525$ y $\sigma_{\beta_0} = 0.380$ y queda así definido su *prior*.
-Para la distribución de $\beta_1$, se considerará que *r* toma valores entre 0.05 y 0.3 (por ende $\beta_1 = -r \in (-0.3, -0.05)$ ). Con esto se obtiene que $\mu_{\beta_1} = -0.175$ y $\sigma_{\beta_1} = 0.042$.
+Para la de la ordenada al origen ($\beta_0$), se suponer una temperatura ambiente de 22° junto con una temperatura inicial del cuerpo entre 36,5° y 37,5°. (temperatura habitual del cuerpo humano); esto daría que la diferencia máxima ocurre en $log(37,5°-22°)=log(15,5°)=2,74$ y la minima se da en $log(36,5°-22°)=log(14,5°)=2,67$. Dado este rango de valores, se deduce que $\mu_{\beta_0} = 2.705$ y $\sigma_{\beta_0} = 0.012$ y queda así definido su *prior*.
+Para la distribución de $\beta_1$, se considerará que *r* toma valores entre 0.05 y 0.3 (por ende $\beta_1 = -r \in (-0.2, -0.1)$ ). Con esto se obtiene que $\mu_{\beta_1} = -0.15$ y $\sigma_{\beta_1} = 0.017$.
 Ahora, $sigma$ es el desvio de la $T(t) - T_{\mathrm{amb}}$ 
-la diferencia máxima entre $T_{\mathrm{amb}}$ y $T(t)$ se da cuando $T(t)$ sea máxima (37°) y $T_{\mathrm{amb}}$ sea minima (-2°), dicha diferencia en 39; y la diferencia minima se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, es decir la diferencia es 0. Por lo que el desvio de la distribucion de $\sigma$ es 6.5
+la diferencia máxima entre $T_{\mathrm{amb}}$ y $T(t)$ se da cuando $T(t)$ sea máxima (37,5°), esto da $15,5°$ la diferencia minima se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, es decir la diferencia es 0. Por lo que el desvio de la distribucion de $\sigma$ es $5,17$
 $t_{\delta}$ es el tiempo en el que se murió Sergio (hora de muerte). Dado que los ruidos se escuchan a las 5:33hs y a las 6:00hs se constata la presencia de un cuerpo inherte, se supone que Sergio muere entre las 5 y las 6 hs.
 
 $$
 \begin{cases}
-\beta_0 \sim N_{(2.525, 0.38)} \\
-\beta_1 \sim N_{(-0.175, 0.042)} \\
-\sigma \sim N^{+}_{(0,6.5)} \\
-t_{\delta} \sim N_{(-1.2, 0.15)}
+\beta_0 \sim N_{(2,705, 0.012)} \\
+\beta_1 \sim N_{(-0.15, 0.017)} \\
+\sigma \sim N^{+}_{(5,17)} \\
+t_{\delta} \sim N_{(-1.25, 0.17)}
 \end{cases}
 $$
 
 # Punto 5: leer el repo de las diapositivas de clases.(presentaciones -> presentacion_06 -> linea 401 a linea 425)
 
 ```{r}
-b0 <- 2.525
-b1 <- -0.175
-sd <- 6 #Valor fijo cualquier para sigma
-t_delta <- -1.2
+b0 <- 2.705
+b1 <- -0.15
+sd <- 3 #Valor fijo cualquier para sigma
+t_delta <- -1.25
 
 data <- tibble(x = c(0, 1.5, 6.75),
        y = rnorm(3, mean = b0 + b1*(x + t_delta), sd = sd))
 
 parameters <-
-  expand.grid(b0 = seq(b0-(3*0.38),b0+(3*0.38),length.out = 100),
-              b1 = seq(b1-(3*0.042),b1+(3*0.042),length.out = 100)) |>
+  expand.grid(b0 = seq(b0-(3*0.012),b0+(3*0.012),length.out = 100),
+              b1 = seq(b1-(3*0.017),b1+(3*0.017),length.out = 100)) |>
   mutate(prior = purrr::map2_dbl(b0, b1, ~mvtnorm::dmvnorm(x = c(.x,.y), 
-                                                           mean = c(2.525,-0.175), 
-                                                           sigma = diag(c(0.38, 0.042),2))))
+                                                           mean = c(2.705,-0.15), 
+                                                           sigma = diag(c(0.012, 0.017),2))))
 
 
 rectas_prior <- 
