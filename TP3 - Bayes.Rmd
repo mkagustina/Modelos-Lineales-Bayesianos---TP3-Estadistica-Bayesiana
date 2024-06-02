@@ -160,27 +160,28 @@ $$
 # Punto 5: leer el repo de las diapositivas de clases.(presentaciones -> presentacion_06 -> linea 401 a linea 425)
 
 ```{r}
-b0 <- 2.705
+b0 <- 2.67
 b1 <- -0.15
 sd <- 3 #Valor fijo cualquier para sigma
 t_delta <- -1.25
 
 data <- tibble(x = c(0, 1.5, 6.75),
-       y = rnorm(3, mean = b0 + b1*(x + t_delta), sd = sd))
+       t = c(2.38,2.14,0.53))
 
 parameters <-
   expand.grid(b0 = seq(b0-(3*0.012),b0+(3*0.012),length.out = 100),
               b1 = seq(b1-(3*0.017),b1+(3*0.017),length.out = 100)) |>
   mutate(prior = purrr::map2_dbl(b0, b1, ~mvtnorm::dmvnorm(x = c(.x,.y), 
-                                                           mean = c(2.705,-0.15), 
+                                                           mean = c(2.67,-0.15), 
                                                            sigma = diag(c(0.012, 0.017),2))))
 
 
 rectas_prior <- 
   ggplot(data) +
-  geom_point(aes(x=x, y=y), size = 3) +
+  geom_point(aes(x=x, y=t), size = 3) +
   geom_abline(data = parameters %>%
-  slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) 
+  slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
+  lims(y=c(0.5,3))
 
 ```
 
