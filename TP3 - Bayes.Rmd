@@ -159,8 +159,27 @@ $$
 
 # Punto 5: leer el repo de las diapositivas de clases.(presentaciones -> presentacion_06 -> linea 401 a linea 425)
 
+Se considera a la hora de muerte entre las 4 y las 6
+beta0=ln(temp a las 6.45 - 22)
+temp baja por hora entre 1 y 1.5
+si ocurrio a las 4: 
+si vale 1: 
+maximo: 37.2 - 2.45=34.75
+minimo 36.1 - 2.45=33.65
+si vale 1.5:
+maximo: 37.2 - 2.45*1.5=33.525
+minimo: 36.1 - 2.45por1.5=*32.425*
+si ocurrio a las 6: 
+si vale 1: 
+maximo: 37.2 - 0.45=*36.75*
+minimo 36.1 - 0.45=35.65
+si vale 1.5:
+maximo: 37.2 - 0.45*1.5=36.525
+minimo: 36.1 - 0.45*1.5=35.426
+
+
 ```{r}
-b0 <- 2.67
+b0 <- 2.517
 b1 <- -0.15
 sd <- 3 #Valor fijo cualquier para sigma
 t_delta <- -1.25
@@ -169,11 +188,11 @@ data <- tibble(x = c(0, 1.5, 6.75),
        t = c(2.38,2.14,0.53))
 
 parameters <-
-  expand.grid(b0 = seq(b0-(3*0.012),b0+(3*0.012),length.out = 100),
+  expand.grid(b0 = seq(b0-(3*0.0578),b0+(3*0.0578),length.out = 100),
               b1 = seq(b1-(3*0.017),b1+(3*0.017),length.out = 100)) |>
   mutate(prior = purrr::map2_dbl(b0, b1, ~mvtnorm::dmvnorm(x = c(.x,.y), 
-                                                           mean = c(2.67,-0.15), 
-                                                           sigma = diag(c(0.012, 0.017),2))))
+                                                           mean = c(2.517,-0.15), 
+                                                           sigma = diag(c(0.0578, 0.017),2))))
 
 
 rectas_prior <- 
@@ -183,7 +202,10 @@ rectas_prior <-
   slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
   lims(y=c(0.5,3))
 
+
+
 ```
+cuerpo en la heladera por eso outlier
 
 
 # Lo de abajo creo que sirve para el punto 6 en adelante----------
@@ -192,20 +214,20 @@ rectas_prior <-
 Teniendo en cuenta la información cronológica presentada al inicio del trabajo, se presenta la tabla 1 (por ponerle un número). Se considera como $t = 0$ al horario en el que se le registra la temperatura por primera vez al cuerpo de Sergio (6:45hs), mientras que los demás tiempos son la diferencia, en minutos, entre esa hora y la hora en la que se tomán las restantes temperaturas (8:15hs y 13:30hs).
 
 ```{r, eval=FALSE}
-#Se arma una tabla con las temperaturas del cuerpo observadas y los tiempo
+#Se arma una tabla con las temperaturas del cuerpo observadas y los tiempos
 datos <- data.frame(
-  t = c(0, 90, 405),
+  t = c(0, 1.5, 6.75),
   temp = c(32.8, 30.5, 23.7)
 )
 
 kable(datos)
-
+temp_obs <- 32.8
 t_amb <- 22
-temp_obs <- datos$temp
+
 stan_data <- list(
-  N = 3,
-  t = datos$t,
-  temp_obs = temp_obs,
+  N = 1,
+  t = 0,
+  temp_obs,
   y = log(temp_obs - t_amb)
 )
 
@@ -214,7 +236,7 @@ stan_model <- stan(
   chains = 4,
   data = stan_data,
   refresh = 1,
-  seed = 
+  seed = 200
 )
 
 
