@@ -123,17 +123,17 @@ Para mayor simplicidad a la hora de contruir un modelo, en lugar de trabajar con
 
 Se demuestra a continuación un resultado que será de vital importancia para la construcción de un modelo: el logaritmo natural de la nueva variable $T(t) - T_{\mathrm{amb}}$ es una función lineal de *t*.
 
-$$ \ln(T(t) - T_{\mathrm{amb}}) = \ln( T_{\mathrm{diff}} \cdot e^{-rt}) = \ln(T_{\mathrm{diff}}) + (-rt) \cdot \ln (e) = \ln(T_{\mathrm{diff}}) - rt = \beta_{0} + \beta_{1}\cdot (t+t_\delta)$$
+$$ \ln(T(t) - T_{\mathrm{amb}}) = \ln( T_{\mathrm{diff}} \cdot e^{-rt}) = \ln(T_{\mathrm{diff}}) + (-rt) \cdot \ln (e) = \ln(T_{\mathrm{diff}}) - rt = \beta_{0} + \beta_{1}\cdot t$$
 
-Se puede interpretar a $\beta_{0}$ como el valor del $\ln(T(t) - T_{\mathrm{amb}})$ cuando $t=0$, es decir, al momento de la muerte. Si se exponencian ambos miembros se obtiene que 
+Se puede interpretar a $\beta_{0}$ como el valor del $\ln(T(t) - T_{\mathrm{amb}})$ cuando $t=0$. Al exponenciar ambos miembros se obtiene que 
 $$ T(t=0) - T_{\mathrm{amb}} = e^{\beta_0}$$ 
-por lo cual la temperatura al momento de la muerte es igual a $e^{\beta_0} + T_{\mathrm{amb}}$
+Si se toma como tiempo cero el momento de la primera medición, entonces la temperatura del cuerpo en ese momento es igual a $e^{\beta_0} + T_{\mathrm{amb}}$
+
+$\beta_1$ es el opuesto de la constante de conductividad. Representa el cambio en el logaritmo de la diferencia entre la temperatura corporal y la temperatura ambiente por cada hora transcurrida.
+
+Para determinar la hora de muerte de Sergio, se trabajará con un modelo lineal bayesiano; se determinarán creencias a priori para los parámetros desconocidos para luego actualizarlas con las mediciones de temperatura que se realizaron al cuerpo del hombre. 
 
 ---
-
-$\beta_{1}$ es cuánto va cambiando el logaritmo de la diferencia entre la temperatura corporal y la temperatura del ambiente por cada hora que transcurre. Por este motivo es la constante de conductividad.
-
-¿Dónde participa la Estadística Bayesiana en todo esto? Al igual que en los temas previamente trabajados, se deben definir una verosimilitud y priors. 
 
 $$
 \begin{cases} 
@@ -214,7 +214,7 @@ cuerpo en la heladera por eso outlier
 Teniendo en cuenta la información cronológica presentada al inicio del trabajo, se presenta la tabla 1 (por ponerle un número). Se considera como $t = 0$ al horario en el que se le registra la temperatura por primera vez al cuerpo de Sergio (6:45hs), mientras que los demás tiempos son la diferencia, en minutos, entre esa hora y la hora en la que se tomán las restantes temperaturas (8:15hs y 13:30hs).
 
 
-```{r}
+```{r, eval=FALSE}
 #Se arma una tabla con las temperaturas del cuerpo observadas y los tiempos
 datos <- data.frame(
   t = c(0),
@@ -292,7 +292,7 @@ va aprox entre -2.5 y 0 (esto es dos horas con 30 minutos)
 
 este codigo no funciona:
 
-```{r}
+```{r, eval=FALSE}
 datos2 <- data.frame(
   t = c(0,1.5),
   temp = c(32.8,30.5)
