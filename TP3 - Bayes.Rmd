@@ -36,6 +36,8 @@ library(ggplot2)
 library(dplyr)
 library(kableExtra)
 library(rstan)
+library(bayesplot)
+library(tidyr)
 ```
 # Introducción
 
@@ -145,7 +147,7 @@ Dado que $\beta_0$, $\beta_1$, $\sigma$ y $t_{\delta}$ serán las variables alet
 Para la de la ordenada al origen ($\beta_0$), se suponer una temperatura ambiente de 22° junto con una temperatura inicial del cuerpo entre 36,5° y 37,5°. (temperatura habitual del cuerpo humano); esto daría que la diferencia máxima ocurre en $log(37,5°-22°)=log(15,5°)=2,74$ y la minima se da en $log(36,5°-22°)=log(14,5°)=2,67$. Dado este rango de valores, se deduce que $\mu_{\beta_0} = 2.705$ y $\sigma_{\beta_0} = 0.012$ y queda así definido su *prior*.
 Para la distribución de $\beta_1$, se considerará que *r* toma valores entre 0.05 y 0.3 (por ende $\beta_1 = -r \in (-0.2, -0.1)$ ). Con esto se obtiene que $\mu_{\beta_1} = -0.15$ y $\sigma_{\beta_1} = 0.017$.
 Ahora, $sigma$ es el desvio de la $T(t) - T_{\mathrm{amb}}$ 
-la diferencia máxima entre $T_{\mathrm{amb}}$ y $T(t)$ se da cuando $T(t)$ sea máxima (37,5°), esto da $15,5°$ la diferencia minima se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, es decir la diferencia es 0. Por lo que el desvio de la distribucion de $\sigma$ es $5,17$
+la diferencia máxima entre $T_{\mathrm{amb}}$ y $T(t)$ se da cuando $T(t)$ sea máxima (37,5°), esto da $15,5°$ la diferencia minima se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, es decir la diferencia es 0. Por lo que el desvio de la distribucion de $\sigma$ es $0.91$
 $t_{\delta}$ es el tiempo en el que se murió Sergio (hora de muerte). Dado que los ruidos se escuchan a las 5:33hs y a las 6:00hs se constata la presencia de un cuerpo inherte, se supone que Sergio muere entre las 5 y las 6 hs.
 
 $$
@@ -181,8 +183,6 @@ minimo: 36.1 - 0.45*1.5=35.426
 ```{r}
 b0 <- 2.517
 b1 <- -0.15
-sd <- 3 #Valor fijo cualquier para sigma
-t_delta <- -1.25
 
 data <- tibble(x = c(0, 1.5, 6.75),
        t = c(2.38,2.14,0.53))
@@ -213,6 +213,160 @@ cuerpo en la heladera por eso outlier
 
 Teniendo en cuenta la información cronológica presentada al inicio del trabajo, se presenta la tabla 1 (por ponerle un número). Se considera como $t = 0$ al horario en el que se le registra la temperatura por primera vez al cuerpo de Sergio (6:45hs), mientras que los demás tiempos son la diferencia, en minutos, entre esa hora y la hora en la que se tomán las restantes temperaturas (8:15hs y 13:30hs).
 
+
+```{r}
+#Se arma una tabla con las temperaturas del cuerpo observadas y los tiempos
+datos <- data.frame(
+  t = c(0),
+  temp = c(32.8)
+)
+
+
+
+t_amb <- 22
+
+stan_data <- list(
+  N = nrow(datos),
+  t = array(datos$t,dim=1),
+  temp_obs= array(datos$temp, dim=1),
+  y = array(log(datos$temp - t_amb), dim=1)
+)
+str(stan_data)
+stan_model <- stan(
+  file = "modelo.stan",
+  chains = 4,
+  data = stan_data,
+  refresh = 1,
+  seed = 200,
+  iter=2000,
+  warmup = 1000,
+  control = list(adapt_delta = 0.95)
+)
+stan_model
+
+mcmc_trace(
+  stan_model, 
+  pars = c("beta0", "beta1", "sigma"),
+  facet_args = list(nrow = 3)
+)
+
+datos_transf <- data.frame(
+  t = c(1.5),
+  temp = c(log(30.5-22))
+)
+
+
+calc_likelihood <- function(datos, b0, b1, sd){
+  lik_i <- dnorm(datos$temp, b0+b1*datos$t, sd)
+  return(prod(lik_i))
+}
+
+dv1 <-
+  datos_transf %>% 
+  slice(1) %>% 
+  tidyr::crossing(parameters) %>% 
+  nest(datos_transf = c(t,temp)) %>%
+  mutate(likelihood = purrr::pmap_dbl(list(datos = datos_transf, b0 = parameters$b0, b1 = parameters$b1, sd = 0.95),
+                                      calc_likelihood)) %>%
+  mutate(posterior = likelihood*prior) %>%
+  select(-datos_transf)
+
+rectas_posterior <-
+  ggplot(datos_transf) +
+  geom_point(aes(x=t, y=temp), size = 3) +
+  geom_point(data = data %>% slice(1), aes(x=x, y=t), size=6) +
+  geom_abline(data = dv1 %>%
+  slice_sample(n = 50, weight_by = posterior), mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) +
+  lims ( x= c(-3,7.5),y=c(0.5,4)) + 
+  geom_hline(yintercept = log(14.65), linetype = "dashed")  +
+  geom_vline(xintercept = 0)
+  
+
+```
+
+todas mezcladas. eso es bueno. el sigma no esta tan bueno. RARI
+recorren bien la distri
+
+es amplio el intervalo de prediccion de horario de muerte. tiene sentido porque el posterior se calculo con una sola observacion. 
+va aprox entre -2.5 y 0 (esto es dos horas con 30 minutos)
+
+este codigo no funciona:
+
+```{r}
+datos2 <- data.frame(
+  t = c(0,1.5),
+  temp = c(32.8,30.5)
+)
+
+
+
+
+
+stan_data2 <- list(
+  N = nrow(datos2),
+  t = datos2$t,
+  temp_obs= datos2$temp,
+  y = log(datos2$temp - t_amb)
+)
+str(stan_data2)
+stan_model2 <- stan(
+  file = "modelo.stan",
+  chains = 4,
+  data = stan_data2,
+  refresh = 1,
+  seed = 200,
+  iter= 2500,
+  warmup = 1000,
+  control = list(adapt_delta = 0.95)
+)
+stan_model2
+
+mcmc_trace(
+  stan_model2, 
+  pars = c("beta0", "beta1", "sigma"),
+  facet_args = list(nrow = 3)
+)
+
+datos2_transf <- data.frame(
+  t = c(0,1.5),
+  temp = c(log(32.8-22),log(30.5-22))
+)
+
+
+calc_likelihood <- function(datos, b0, b1, sd){
+  lik_i <- dnorm(datos$temp, b0+b1*datos$t, sd)
+  return(prod(lik_i))
+}
+
+dv2 <-
+  datos2_transf %>% 
+  slice(c(1,2)) %>%
+  tidyr::crossing(parameters) %>% 
+  nest(datos2_transf = c(t,temp)) %>%
+  mutate(likelihood = purrr::pmap_dbl(list(datos = datos2_transf, b0 = parameters$b0, b1 = parameters$b1, sd = 0.95),
+                                      calc_likelihood)) %>%
+  mutate(posterior = likelihood*parameters$prior) %>%
+  select(-datos2_transf) 
+
+rectas_posterior2 <-
+  ggplot(datos2_transf) +
+ # geom_point(aes(x=t, y=temp), size = 3) +
+  geom_point(data = data %>% slice(1:2), aes(x=x, y=t), size=6) +
+  geom_abline(data = dv2 %>%
+  slice_sample(n = 50, weight_by = posterior), mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) +
+  lims (x = c(-5,5), y=c(0,5)) + 
+  geom_hline(yintercept = log(14.65), linetype = "dashed")  +
+  geom_vline(xintercept = 0)
+  
+```
+
+lo que hay que hacer: generar un nuevo modelo stan con los parametros actualizados del que nos dio arriba. 
+copiar y pegar codigo de arriba cambiando el modelo stan y la nueva obs. 
+
+media beta0 = 2.5 sd= 0.06
+
+
+
 ```{r, eval=FALSE}
 #Se arma una tabla con las temperaturas del cuerpo observadas y los tiempos
 datos <- data.frame(
@@ -220,15 +374,15 @@ datos <- data.frame(
   temp = c(32.8, 30.5, 23.7)
 )
 
-kable(datos)
-temp_obs <- 32.8
+
+
 t_amb <- 22
 
 stan_data <- list(
-  N = 1,
-  t = 0,
-  temp_obs,
-  y = log(temp_obs - t_amb)
+  N = nrow(datos),
+  t = datos$t,
+  temp_obs= datos$temp,
+  y = log(datos$temp - t_amb)
 )
 
 stan_model <- stan(
