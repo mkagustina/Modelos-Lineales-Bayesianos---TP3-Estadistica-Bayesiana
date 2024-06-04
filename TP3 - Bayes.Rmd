@@ -182,8 +182,8 @@ observaciones <- tibble(tiempo = c(0, 1.5, 6.75),
                         y = c(2.38,2.14,0.53))
 
 parametros <-
-  expand.grid(b0 = seq(mu_b0-(3*sigma_b0), mu_b0+(3*sigma_b0),length.out = 100),
-              b1 = seq(mu_b1-(3*sigma_b1), mu_b1+(3*sigma_b1),length.out = 100)) |>
+  expand.grid(b0 = seq(mu_b0-(3*sigma_b0), mu_b0+(3*sigma_b0),length.out = 50),
+              b1 = seq(mu_b1-(3*sigma_b1), mu_b1+(3*sigma_b1),length.out = 50)) |>
   mutate(prior = purrr::map2_dbl(
     b0, b1,~mvtnorm::dmvnorm(x = c(.x,.y),
                                    mean = c(mu_b0, mu_b1),
@@ -191,7 +191,7 @@ parametros <-
 
 rectas_prior <- 
   ggplot(data = observaciones) +
-  geom_point(aes(x=tiempo, y=y), size = 3, color = 'firebrick3') +
+  geom_point(aes(x=tiempo, y=y), size = 3) +
   geom_abline(data = parametros %>%
   slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
   lims(x=c(-2,7),y=c(0.4,3)) +
@@ -207,7 +207,7 @@ Se puede ver que el prior no es tan compatible con las observaciones. La pendien
 
 Se actualiza el modelo con el primer dato observado: la temperatura del cuerpo de Sergio en la primer medición (6:45hs) fue de 32.8ºC.
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, results='hide'}
 # Modelo actualizado con 1 sola observación
 datos1 <- data.frame(
   t = c(0),
@@ -223,7 +223,7 @@ stan_data1 <- list(
   y = array(log(datos1$temp - t_amb), dim=1)
 )
 
-str(stan_data1)
+#str(stan_data1)
 
 stan_model1 <- stan(
   file = "modelo.stan",
@@ -236,9 +236,10 @@ stan_model1 <- stan(
   control = list(adapt_delta = 0.95)
 )
 
-summary(stan_model1)
+#summary(stan_model1)
 ```
 
+Lo único que cambia es la distribución de sigma.
 Nuestro modelo actualizado con 1 obs es:
 
 $$
@@ -263,7 +264,7 @@ mcmc_trace(
 
 Las cadenas parece que convergen todas
 
-```{r, eval=FALSE}
+```{r}
 # Primera observacion
 datos_transf1 <- data.frame(
   t = c(0),
@@ -294,20 +295,22 @@ rectas_posterior <-
   geom_abline(data = dv1 %>%
   slice_sample(n = 50, weight_by = posterior), mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) + 
   lims ( x= c(-3,7.5),y=c(0.5,4)) +
-  geom_hline(yintercept = log(36.5-22), linetype = "dashed")
+  theme_bw() +
+  geom_hline(yintercept = log(37-22), linetype = "dashed") +
+  geom_vline(xintercept = -0.3) +
+  geom_vline(xintercept = 0.3)
+
+rectas_posterior
   
 ```
 
-todas mezcladas. eso es bueno. el sigma no esta tan bueno. RARI
-recorren bien la distri
-
-es amplio el intervalo de prediccion de horario de muerte. tiene sentido porque el posterior se calculo con una sola observacion. 
-va aprox entre -2.5 y 0 (esto es dos horas con 30 minutos)
+Según este nuevo modelo, Serio murió entre el tiempo -0.3 y 0.3. Malísimo.
+Una sola observación no fue suficiente para "bajar" el b0
 
 ## Modelo con 2 obs
 
 
-```{r, eval=FALSE}
+```{r, results='hide'}
 datos2 <- data.frame(
   t = c(0, 1.5),
   temp = c(32.8, 30.5)
@@ -320,7 +323,7 @@ stan_data2 <- list(
   y = log(datos2$temp - t_amb)
 )
 
-str(stan_data2)
+#str(stan_data2)
 
 stan_model2 <- stan(
   file = "modelo.stan",
@@ -333,7 +336,7 @@ stan_model2 <- stan(
   control = list(adapt_delta = 0.95)
 )
 
-summary(stan_model2)
+#summary(stan_model2)
 ```
 
 Ahora, el modelo actualizado es:
@@ -349,38 +352,7 @@ $$
 \end{cases}
 $$
 
-Evaluamos la calidad predictiva del nuevo modelo
-
-```{r}
-mu_b0 <- 2.704
-sigma_b0 <- 0.012
-mu_b1 <- -0.15
-sigma_b1 <- 0.017
-
-observaciones <- tibble(tiempo = c(0, 1.5, 6.75),
-                        y = c(2.38,2.14,0.53))
-
-parametros <-
-  expand.grid(b0 = seq(mu_b0-(3*sigma_b0), mu_b0+(3*sigma_b0),length.out = 100),
-              b1 = seq(mu_b1-(3*sigma_b1), mu_b1+(3*sigma_b1),length.out = 100)) |>
-  mutate(prior = purrr::map2_dbl(
-    b0, b1,~mvtnorm::dmvnorm(x = c(.x,.y),
-                                   mean = c(mu_b0, mu_b1),
-                                   sigma = diag(c(sigma_b0, sigma_b1),2))))
-
-rectas_prior <- 
-  ggplot(data = observaciones) +
-  geom_point(aes(x=tiempo, y=y), size = 3, color = 'firebrick3') +
-  geom_abline(data = parametros %>%
-  slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
-  lims(x=c(-2,7),y=c(0.4,3)) +
-  theme_bw() +
-  labs(caption = 'Figura 3: rectas predictivas a posteriori con el modelo 1')
-
-rectas_prior
-```
-
-este codigo no funciona:
+Vemos posibles rectas con el nuevo modelo
 
 ```{r, eval=FALSE}
 mcmc_trace(
@@ -388,89 +360,48 @@ mcmc_trace(
   pars = c("beta0", "beta1", "sigma"),
   facet_args = list(nrow = 3)
 )
-
-datos2_transf <- data.frame(
-  t = c(0,1.5),
-  temp = c(log(32.8-22),log(30.5-22))
-)
-
-
-calc_likelihood <- function(datos, b0, b1, sd){
-  lik_i <- dnorm(datos$temp, b0+b1*datos$t, sd)
-  return(prod(lik_i))
-}
-
-dv2 <-
-  datos2_transf %>% 
-  slice(c(1,2)) %>%
-  tidyr::crossing(parameters) %>% 
-  nest(datos2_transf = c(t,temp)) %>%
-  mutate(likelihood = purrr::pmap_dbl(list(datos = datos2_transf, b0 = parameters$b0, b1 = parameters$b1, sd = 0.95),
-                                      calc_likelihood)) %>%
-  mutate(posterior = likelihood*parameters$prior) %>%
-  select(-datos2_transf) 
-
-rectas_posterior2 <-
-  ggplot(datos2_transf) +
- # geom_point(aes(x=t, y=temp), size = 3) +
-  geom_point(data = data %>% slice(1:2), aes(x=x, y=t), size=6) +
-  geom_abline(data = dv2 %>%
-  slice_sample(n = 50, weight_by = posterior), mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) +
-  lims (x = c(-5,5), y=c(0,5)) + 
-  geom_hline(yintercept = log(14.65), linetype = "dashed")  +
-  geom_vline(xintercept = 0)
-  
-```
-
-lo que hay que hacer: generar un nuevo modelo stan con los parametros actualizados del que nos dio arriba. 
-copiar y pegar codigo de arriba cambiando el modelo stan y la nueva obs. 
-
-media beta0 = 2.5 sd= 0.06
-
-```{r, eval=FALSE}
-datos_transf <- data.frame(
-  t = c(1.5),
-  temp = c(log(30.5-22))
-)
-
-
-calc_likelihood <- function(datos, b0, b1, sd){
-  lik_i <- dnorm(datos$temp, b0+b1*datos$t, sd)
-  return(prod(lik_i))
-}
-
-dv1 <-
-  datos_transf %>% 
-  slice(1) %>% 
-  tidyr::crossing(parameters) %>% 
-  nest(datos_transf = c(t,temp)) %>%
-  mutate(likelihood = purrr::pmap_dbl(list(datos = datos_transf, b0 = parameters$b0, b1 = parameters$b1, sd = 0.95),
-                                      calc_likelihood)) %>%
-  mutate(posterior = likelihood*prior) %>%
-  select(-datos_transf)
-
-rectas_posterior <-
-  ggplot(datos_transf) +
-  geom_point(aes(x=t, y=temp), size = 3) +
-  geom_point(data = data %>% slice(1), aes(x=x, y=t), size=6) +
-  geom_abline(data = dv1 %>%
-  slice_sample(n = 50, weight_by = posterior), mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) +
-  lims ( x= c(-3,7.5),y=c(0.5,4)) + 
-  geom_hline(yintercept = log(14.65), linetype = "dashed")  +
-  geom_vline(xintercept = 0)
-  
-
 ```
 
 todas mezcladas. eso es bueno. el sigma no esta tan bueno. RARI
 recorren bien la distri
 
-es amplio el intervalo de prediccion de horario de muerte. tiene sentido porque el posterior se calculo con una sola observacion. 
-va aprox entre -2.5 y 0 (esto es dos horas con 30 minutos)
+La muestra parece ser buena
+
+```{r}
+datos_transf2 <- data.frame(
+  t = c(0, 1.5),
+  temp = c(log(32.8-22),log(30.5-22))
+)
+
+dv2 <-
+  datos_transf2 %>% 
+  slice(c(1,2)) %>%
+  tidyr::crossing(parametros) %>% 
+  nest(datos_transf2 = c(t,temp)) %>%
+  mutate(likelihood = purrr::pmap_dbl(list(datos = datos_transf2, b0 = parametros$b0, b1 = parametros$b1, sd = 0.6),
+                                      calc_likelihood)) %>%
+  mutate(posterior = likelihood*prior) %>%
+  select(-datos_transf2) 
+
+rectas_posterior2 <-
+  ggplot(observaciones) +
+ geom_point(aes(x=tiempo, y=y), size = 3) +
+  geom_point(data = observaciones %>% slice(1:2), aes(x=tiempo, y=y), size=4, color = "firebrick3") +
+  geom_abline(data = dv2 %>%
+  slice_sample(n = 50, weight_by = posterior), mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) +
+  lims ( x= c(-3,7.5),y=c(0.5,4)) +
+  theme_bw()+
+  geom_hline(yintercept = log(37-22), linetype = "dashed")  +
+  geom_vline(xintercept = 0)
+
+rectas_posterior2
+```
+
+Sergio se murió aprox entre...
 
 ## Modelo con 3 obs
 
-```{r, eval=FALSE}
+```{r, results='hide'}
 #Se arma una tabla con las temperaturas del cuerpo observadas y los tiempos
 datos3 <- data.frame(
   t = c(0, 1.5, 6.75),
@@ -511,6 +442,50 @@ $$
 \sigma \sim \mathcal{N}^{+}_{(0.33)}
 \end{cases}
 $$
+
+```{r, eval=FALSE}
+mcmc_trace(
+  stan_model3, 
+  pars = c("beta0", "beta1", "sigma"),
+  facet_args = list(nrow = 3)
+)
+```
+
+todas mezcladas. eso es bueno. el sigma no esta tan bueno. RARI
+recorren bien la distri
+
+La muestra parece ser buena
+
+```{r}
+datos_transf3 <- data.frame(
+  t = c(0, 1.5, 6.75),
+  temp = c(log(32.8-22),log(30.5-22), log(23.7-22))
+)
+
+dv3 <-
+  datos_transf3 %>% 
+  slice(c(1,2,3)) %>%
+  tidyr::crossing(parametros) %>% 
+  nest(datos_transf3 = c(t,temp)) %>%
+  mutate(likelihood = purrr::pmap_dbl(list(datos = datos_transf3, b0 = parametros$b0, b1 = parametros$b1, sd = 0.6),
+                                      calc_likelihood)) %>%
+  mutate(posterior = likelihood*prior) %>%
+  select(-datos_transf3) 
+
+rectas_posterior3 <-
+  ggplot(observaciones) +
+  geom_point(aes(x=tiempo, y=y), size=4, color = "firebrick3") +
+  geom_abline(data = dv3 %>%
+  slice_sample(n = 50, weight_by = posterior), mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) +
+  lims ( x= c(-3,7.5),y=c(0.5,4)) +
+  theme_bw()+
+  geom_hline(yintercept = log(37-22), linetype = "dashed")  +
+  geom_vline(xintercept = 0)
+
+rectas_posterior3
+```
+
+Sergio se murió aprox entre...
 
 ## Cosas que no entiendo y me da cosa borrar
 
