@@ -12,8 +12,8 @@ parameters {
 }
 
 model {
-  beta0 ~ normal(2.705, 0.012);
-  beta1 ~ normal(-0.15, 0.017);
+  beta0 ~ normal(2.705, 0.1);
+  beta1 ~ normal(-0.15, 0.1);
   sigma ~ normal(0,0.91);
   y ~ normal(beta0 + beta1 * t, sigma);
 }
