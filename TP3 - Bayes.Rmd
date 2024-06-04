@@ -150,9 +150,15 @@ Como se menciona en la ecuación (2), $\beta_0$ es el $\ln(T_{\mathrm{diff}}) = 
 
 Con este rango de valores, se puede suponer a priori una distribución normal para $\beta_0$, de media $\mu_{\beta_0} = \frac{2.74 + 2.67}{2}=2.705$ y desvío $\sigma_{\beta_0} = \frac{2.74-2.705}{3} = 0.012$, quedando así definido su *prior*.
 
+**CAMBIO:** el tiempo 0 es el momento de la primer medición. Sabemos que a las 5:33hs la vecina de Sergio escuchó ruidos provenientes de su casa, y la primer medición de temperatura se hizo a las 6:45hs. Entonces, podemos pensar que al momento de la primer medición Sergio llevaba muerto entre 1 y 2 horas. 
+En ese tiempo, de esperar que la temperatura de su cuerpo haya descendido entre 2 y 4 grados, como mucho. Si consideramos la temperatura normal del cuerpo humano en 36.5ºC, entonces el $\ln(T(t) - T_{\mathrm{amb}})$ máximo es $\ln((36.5-2) - 22) = 2.526$ y el mínimo es $\ln((36.5-4) - 22) = 2.351$
+Entonces podemos decir que $\beta_0$ tiene a priori una distribución normal con media $\mu_{\beta_0} = \frac{2.526 + 2.351}{2}=2.439$ y desvío $\sigma_{\beta_0} = \frac{2.526-2.439}{3} = 0.029$
+
 Para definir una distribución para $\beta_1$, se puede utilizar la Figura 1; si bien el gráfico se realizó para una temperatura ambiente 1ºC más alta que la actual, las conclusiones son las mismas. Entonces, si un valor razonable para *r* se encuentra entre 0.1 y 0.2, se puede decir que $\beta_1 = -r$ toma valores entre -0.2 y -0.1.
 
-Si nuevamente se utiliza una distribución normal, se obtiene que $\beta_1 \sim \mathcal{N}(\mu_{\beta_1},\sigma_{\beta_1})$, con media  $\mu_{\beta_1} = \frac{-0.2-0.1}{2} = -0.15$ y desvío $\sigma_{\beta_1} = \frac{-0.1+0.15}{3} = 0.017$.
+Si nuevamente se utiliza una distribución normal, se obtiene que $\beta_1 \sim \mathcal{N}(\mu_{\beta_1},\sigma_{\beta_1})$, con media  $\mu_{\beta_1} = \frac{-0.2-0.1}{2} = -0.15$ y desvío $\sigma_{\beta_1} = \frac{-0.1+0.15}{3} = 0.033$.
+
+**CAMBIO:** sin embargo, como Sergio murió desangrado y la pérdida de sangre puede acelerar el descenso de la temperatura corporal, se permitirá que *-r* tome valores entre -3 y -1. Por eso se propone a priori una distribución normal de media $\mu_{\beta_1} = \frac{-0.3-0.1}{2} = -0.2$ y desvío $\sigma_{\beta_1} = \frac{-0.1+0.2}{3} = 0.017$.
 
 Por último, $sigma$ es el desvío del $\ln(T(t) - T_{\mathrm{amb}})$. La diferencia máxima entre la temperatura ambiente (22ºC) y $T(t)$ se da cuando $T(t)$ es máxima (37,5º). En ese caso, $\ln(37.5-22)=2.74$. La diferencia mínima es de cero grados, y se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, pero ahí el logaritmo no existe. 
 
@@ -173,10 +179,18 @@ $$
 Se realizan pruebas predictivas a priori para este modelo.
 
 ```{r}
-mu_b0 <- 2.705
-sigma_b0 <- 0.012
-mu_b1 <- -0.15
-sigma_b1 <- 0.017
+mu_b0 <- 2.439
+sigma_b0 <- 0.029
+mu_b1 <- -0.2
+sigma_b1 <- 0.033
+
+# Prior de Beta0 original
+# mu_b0 <- 2.705
+# sigma_b0 <- 0.012
+
+# Prior de Beta1 original
+# mu_b1 <- -0.15
+# sigma_b1 <- 0.017
 
 observaciones <- tibble(tiempo = c(0, 1.5, 6.75),
                         y = c(2.38,2.14,0.53))
@@ -194,9 +208,11 @@ rectas_prior <-
   geom_point(aes(x=tiempo, y=y), size = 3) +
   geom_abline(data = parametros %>%
   slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
-  lims(x=c(-2,7),y=c(0.4,3)) +
-  theme_bw() +
-  labs(caption = 'Figura 2: rectas predictivas a priori')
+  # lims(x=c(-2,7),y=c(0.4,3)) +
+  lims ( x= c(-3,7.5),y=c(0.5,4)) +
+  theme_bw() 
+# +
+#   labs(caption = 'Figura 2: rectas predictivas a priori')
 
 rectas_prior
 ```
