@@ -39,7 +39,7 @@ library(rstan)
 library(bayesplot)
 library(tidyr)
 ```
-# Introducción
+## Introducción
 
 La tanatocronología, derivada de las palabras griegas "thanatos" (muerte) y "chronos" (tiempo), es un subcampo de la medicina forense que se centra en determinar el intervalo postmortem, es decir, el tiempo transcurrido desde la muerte hasta el descubrimiento del cadáver.[^1]
 
@@ -59,7 +59,7 @@ El objetivo de este trabajo es averiguar la hora de muerte de Sergio Contreras, 
 
 * 13:30 hs - Comienza la autopsia. El cadáver se encuentra a 23.7 °C.
 
-# Sección con nombre ????
+## Sección con nombre ????
 
 Como el ritmo con el cual el cuerpo pierde temperatura no es constante, se puede pensar que la derivada de la temperatura respecto al tiempo varía con el tiempo. En este caso, la temperatura del cadáver satisface la siguiente ley: 
 $$ \frac{dT(t)}{dt} = r[T_{\text{amb}}-T(t)] \tag{1} $$
@@ -119,11 +119,13 @@ Los órganos abdominales pueden mantener el calor por al menos 24 horas. En las 
 
 Teniendo en cuenta esta información y lo observado en la Figura 1, se puede considerar que un valor razonable para *r* se encuentra entre 0.1 y 0.2.
 
-Para mayor simplicidad a la hora de contruir un modelo, en lugar de trabajar con la temperatura del cuerpo se decide utilizar la diferencia entre la temperatura del mismo y la temperatura ambiente $T(t) - T_{\mathrm{amb}}$. Además, se define $T_{\mathrm{diff}} = T_i - T_{\mathrm{amb}}$; por lo que se obtiene finalmente que $T(t) - T_{\mathrm{amb}} = T_{\mathrm{diff}} \cdot e ^ {-rt}$.
+## Postulación del modelo
+
+Para mayor simplicidad a la hora de construir un modelo, en lugar de trabajar con la temperatura del cuerpo se decide utilizar la diferencia entre la temperatura del mismo y la temperatura ambiente $T(t) - T_{\mathrm{amb}}$. Además, se define $T_{\mathrm{diff}} = T_i - T_{\mathrm{amb}}$; por lo que se obtiene finalmente que $T(t) - T_{\mathrm{amb}} = T_{\mathrm{diff}} \cdot e ^ {-rt}$.
 
 Se demuestra a continuación un resultado que será de vital importancia para la construcción de un modelo: el logaritmo natural de la nueva variable $T(t) - T_{\mathrm{amb}}$ es una función lineal de *t*.
 
-$$ \ln(T(t) - T_{\mathrm{amb}}) = \ln( T_{\mathrm{diff}} \cdot e^{-rt}) = \ln(T_{\mathrm{diff}}) + (-rt) \cdot \ln (e) = \ln(T_{\mathrm{diff}}) - rt = \beta_{0} + \beta_{1}\cdot t$$
+$$ \ln(T(t) - T_{\mathrm{amb}}) = \ln( T_{\mathrm{diff}} \cdot e^{-rt}) = \ln(T_{\mathrm{diff}}) + (-rt) \cdot \ln (e) = \ln(T_{\mathrm{diff}}) - rt = \beta_{0} + \beta_{1}\cdot t \tag{2}$$
 
 Se puede interpretar a $\beta_{0}$ como el valor del $\ln(T(t) - T_{\mathrm{amb}})$ cuando $t=0$. Al exponenciar ambos miembros se obtiene que 
 $$ T(t=0) - T_{\mathrm{amb}} = e^{\beta_0}$$ 
@@ -131,31 +133,41 @@ Si se toma como tiempo cero el momento de la primera medición, entonces la temp
 
 $\beta_1$ es el opuesto de la constante de conductividad. Representa el cambio en el logaritmo de la diferencia entre la temperatura corporal y la temperatura ambiente por cada hora transcurrida.
 
-Para determinar la hora de muerte de Sergio, se trabajará con un modelo lineal bayesiano; se determinarán creencias a priori para los parámetros desconocidos para luego actualizarlas con las mediciones de temperatura que se realizaron al cuerpo del hombre. 
+Para determinar la hora de muerte de Sergio, se trabajará con un modelo lineal bayesiano; se determinarán creencias a priori para los parámetros desconocidos para luego actualizarlas con las mediciones de temperatura que se realizaron al cuerpo del hombre. Para este proceso, se considera que la temperatura ambiente (constante a través del tiempo) es de 22ºC.
 
----
+El modelo propuesto incompleto, porque faltan las distribuciónes a priori de sus parámetros, es el siguiente:
 
 $$
 \begin{cases} 
-ln(T(t) - T_{\mathrm{amb}}) \sim N_{(\mu, \sigma)} \\
-\mu = \beta_{0} + \beta_{1}(t + t_{\delta})
+\ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
+\mu = \beta_{0} + \beta_{1}\cdot t
 \end{cases}
 $$
 
+Se asignarán distribuciónes a priori para los parámetros desconocidos $\beta_0$, $\beta_1$ y $\sigma$. Si bien $\mu$ también es desconocido, no se le asigna un prior propio ya que su valor depende exclusivamente de $\beta_0$ y $\beta_1$, de forma que una vez asignados valores para estos dos parámetros, $\mu$ queda definido. 
 
-Dado que $\beta_0$, $\beta_1$, $\sigma$ y $t_{\delta}$ serán las variables aletorias, las distribuciones a priori se definen sobre ellas. 
-Para la de la ordenada al origen ($\beta_0$), se suponer una temperatura ambiente de 22° junto con una temperatura inicial del cuerpo entre 36,5° y 37,5°. (temperatura habitual del cuerpo humano); esto daría que la diferencia máxima ocurre en $log(37,5°-22°)=log(15,5°)=2,74$ y la minima se da en $log(36,5°-22°)=log(14,5°)=2,67$. Dado este rango de valores, se deduce que $\mu_{\beta_0} = 2.705$ y $\sigma_{\beta_0} = 0.012$ y queda así definido su *prior*.
-Para la distribución de $\beta_1$, se considerará que *r* toma valores entre 0.05 y 0.3 (por ende $\beta_1 = -r \in (-0.2, -0.1)$ ). Con esto se obtiene que $\mu_{\beta_1} = -0.15$ y $\sigma_{\beta_1} = 0.017$.
-Ahora, $sigma$ es el desvio de la $T(t) - T_{\mathrm{amb}}$ 
-la diferencia máxima entre $T_{\mathrm{amb}}$ y $T(t)$ se da cuando $T(t)$ sea máxima (37,5°), esto da $15,5°$ la diferencia minima se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, es decir la diferencia es 0. Por lo que el desvio de la distribucion de $\sigma$ es $0.91$
-$t_{\delta}$ es el tiempo en el que se murió Sergio (hora de muerte). Dado que los ruidos se escuchan a las 5:33hs y a las 6:00hs se constata la presencia de un cuerpo inherte, se supone que Sergio muere entre las 5 y las 6 hs.
+Como se menciona en la ecuación (2), $\beta_0$ es el $\ln(T_{\mathrm{diff}}) = \ln(T_i - T_{\mathrm{amb}})$. Se sabe que la temperatura ambiente es de 22ºC, mientras que la temperatura inicial del cuerpo se encuentra entre 36,5ºC y 37,5ºC (temperatura habitual del cuerpo humano). Con esto se puede decir que el valor mínimo para $\beta_0$ es $\ln(36,5^\circ-22^\circ)=\ln(14,5^\circ)=2,67^\circ$, y el máximo es $\ln(37,5^\circ-22^\circ)= \ln(15,5^\circ)=2,74^\circ$.
+
+Con este rango de valores, se puede suponer a priori una distribución normal para $\beta_0$, de media $\mu_{\beta_0} = \frac{2.74 + 2.67}{2}=2.705$ y desvío $\sigma_{\beta_0} = \frac{2.74-2.705}{3} = 0.012$, quedando así definido su *prior*.
+
+Para definir una distribución para $\beta_1$, se puede utilizar la Figura 1; si bien el gráfico se realizó para una temperatura ambiente 1ºC más alta que la actual, las conclusiones son las mismas. Entonces, si un valor razonable para *r* se encuentra entre 0.1 y 0.2, se puede decir que $\beta_1 = -r$ toma valores entre -0.2 y -0.1.
+
+Si nuevamente se utiliza una distribución normal, se obtiene que $\beta_1 \sim \mathcal{N}(\mu_{\beta_1},\sigma_{\beta_1})$, con media  $\mu_{\beta_1} = \frac{-0.2-0.1}{2} = -0.15$ y desvío $\sigma_{\beta_1} = \frac{-0.1+0.15}{3} = 0.017$.
+
+Por último, $sigma$ es el desvío del $\ln(T(t) - T_{\mathrm{amb}})$. La diferencia máxima entre la temperatura ambiente (22ºC) y $T(t)$ se da cuando $T(t)$ es máxima (37,5º). En ese caso, $\ln(37.5-22)=2.74$. La diferencia mínima es de cero grados, y se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, pero ahí el logaritmo no existe. 
+
+Como el desvío de una distribución es estrictamente positivo, se propone para el mismo una distribución Half-normal, con desvío $\sigma_\sigma = \frac{2.74}{3} = 0.91$.
+
+Por lo tanto, el modelo con las distribuciones a priori propuestas es:
 
 $$
 \begin{cases}
-\beta_0 \sim N_{(2,705, 0.012)} \\
-\beta_1 \sim N_{(-0.15, 0.017)} \\
-\sigma \sim N^{+}_{(5,17)} \\
-t_{\delta} \sim N_{(-1.25, 0.17)}
+\ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
+\mu = \beta_{0} + \beta_{1}\cdot t \\
+\\
+\beta_0 \sim \mathcal{N}_{(2.705, 0.012)} \\
+\beta_1 \sim \mathcal{N}_{(-0.15, 0.017)} \\
+\sigma \sim \mathcal{N}^{+}_{(0.91)}
 \end{cases}
 $$
 
