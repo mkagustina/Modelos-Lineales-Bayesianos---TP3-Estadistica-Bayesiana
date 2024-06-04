@@ -144,7 +144,7 @@ $$
 \end{cases}
 $$
 
-Se asignarán distribuciónes a priori para los parámetros desconocidos $\beta_0$, $\beta_1$ y $\sigma$. Si bien $\mu$ también es desconocido, no se le asigna un prior propio ya que su valor depende exclusivamente de $\beta_0$ y $\beta_1$, de forma que una vez asignados valores para estos dos parámetros, $\mu$ queda definido. 
+Se asignarán distribuciones a priori para los parámetros desconocidos $\beta_0$, $\beta_1$ y $\sigma$. Si bien $\mu$ también es desconocido, no se le asigna un prior propio ya que su valor depende exclusivamente de $\beta_0$ y $\beta_1$, de forma que una vez asignados valores para estos dos parámetros, $\mu$ queda definido. 
 
 Como se menciona en la ecuación (2), $\beta_0$ es el $\ln(T_{\mathrm{diff}}) = \ln(T_i - T_{\mathrm{amb}})$. Se sabe que la temperatura ambiente es de 22ºC, mientras que la temperatura inicial del cuerpo se encuentra entre 36,5ºC y 37,5ºC (temperatura habitual del cuerpo humano). Con esto se puede decir que el valor mínimo para $\beta_0$ es $\ln(36,5^\circ-22^\circ)=\ln(14,5^\circ)=2,67^\circ$, y el máximo es $\ln(37,5^\circ-22^\circ)= \ln(15,5^\circ)=2,74^\circ$.
 
@@ -158,7 +158,7 @@ Por último, $sigma$ es el desvío del $\ln(T(t) - T_{\mathrm{amb}})$. La difere
 
 Como el desvío de una distribución es estrictamente positivo, se propone para el mismo una distribución Half-normal, con desvío $\sigma_\sigma = \frac{2.74}{3} = 0.91$.
 
-Por lo tanto, el modelo con las distribuciones a priori propuestas es:
+Por lo tanto, si se consideran independientes los parámetros entre sí, el modelo con las distribuciones a priori propuestas es:
 
 $$
 \begin{cases}
@@ -170,98 +170,132 @@ $$
 \sigma \sim \mathcal{N}^{+}_{(0.91)}
 \end{cases}
 $$
-
-# Punto 5: leer el repo de las diapositivas de clases.(presentaciones -> presentacion_06 -> linea 401 a linea 425)
-
-Se considera a la hora de muerte entre las 4 y las 6
-beta0=ln(temp a las 6.45 - 22)
-temp baja por hora entre 1 y 1.5
-si ocurrio a las 4: 
-si vale 1: 
-maximo: 37.2 - 2.45=34.75
-minimo 36.1 - 2.45=33.65
-si vale 1.5:
-maximo: 37.2 - 2.45*1.5=33.525
-minimo: 36.1 - 2.45por1.5=*32.425*
-si ocurrio a las 6: 
-si vale 1: 
-maximo: 37.2 - 0.45=*36.75*
-minimo 36.1 - 0.45=35.65
-si vale 1.5:
-maximo: 37.2 - 0.45*1.5=36.525
-minimo: 36.1 - 0.45*1.5=35.426
-
+Se realizan pruebas predictivas a priori para este modelo.
 
 ```{r}
-b0 <- 2.517
-b1 <- -0.15
+mu_b0 <- 2.705
+sigma_b0 <- 0.012
+mu_b1 <- -0.15
+sigma_b1 <- 0.017
 
-data <- tibble(x = c(0, 1.5, 6.75),
-       t = c(2.38,2.14,0.53))
+observaciones <- tibble(tiempo = c(0, 1.5, 6.75),
+                        y = c(2.38,2.14,0.53))
 
-parameters <-
-  expand.grid(b0 = seq(b0-(3*0.0578),b0+(3*0.0578),length.out = 100),
-              b1 = seq(b1-(3*0.017),b1+(3*0.017),length.out = 100)) |>
-  mutate(prior = purrr::map2_dbl(b0, b1, ~mvtnorm::dmvnorm(x = c(.x,.y), 
-                                                           mean = c(2.517,-0.15), 
-                                                           sigma = diag(c(0.0578, 0.017),2))))
-
+parametros <-
+  expand.grid(b0 = seq(mu_b0-(3*sigma_b0), mu_b0+(3*sigma_b0),length.out = 100),
+              b1 = seq(mu_b1-(3*sigma_b1), mu_b1+(3*sigma_b1),length.out = 100)) |>
+  mutate(prior = purrr::map2_dbl(
+    b0, b1,~mvtnorm::dmvnorm(x = c(.x,.y),
+                                   mean = c(mu_b0, mu_b1),
+                                   sigma = diag(c(sigma_b0, sigma_b1),2))))
 
 rectas_prior <- 
-  ggplot(data) +
-  geom_point(aes(x=x, y=t), size = 3) +
-  geom_abline(data = parameters %>%
+  ggplot(data = observaciones) +
+  geom_point(aes(x=tiempo, y=y), size = 3, color = 'firebrick3') +
+  geom_abline(data = parametros %>%
   slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
-  lims(y=c(0.5,3))
+  lims(x=c(-2,7),y=c(0.4,3)) +
+  theme_bw() +
+  labs(caption = 'Figura 2: rectas predictivas a priori')
 
-
-
+rectas_prior
 ```
-cuerpo en la heladera por eso outlier
 
+Se puede ver que el prior no es tan compatible con las observaciones. La pendiente parece estar bien, pero el $\beta_0$ es muy alto.
 
-# Lo de abajo creo que sirve para el punto 6 en adelante----------
+## Primer observación
 
+Se actualiza el modelo con el primer dato observado: la temperatura del cuerpo de Sergio en la primer medición (6:45hs) fue de 32.8ºC.
 
-Teniendo en cuenta la información cronológica presentada al inicio del trabajo, se presenta la tabla 1 (por ponerle un número). Se considera como $t = 0$ al horario en el que se le registra la temperatura por primera vez al cuerpo de Sergio (6:45hs), mientras que los demás tiempos son la diferencia, en minutos, entre esa hora y la hora en la que se tomán las restantes temperaturas (8:15hs y 13:30hs).
-
-
-```{r, eval=FALSE}
-#Se arma una tabla con las temperaturas del cuerpo observadas y los tiempos
-datos <- data.frame(
+```{r, warning=FALSE}
+# Modelo actualizado con 1 sola observación
+datos1 <- data.frame(
   t = c(0),
   temp = c(32.8)
 )
 
-
-
 t_amb <- 22
 
-stan_data <- list(
-  N = nrow(datos),
-  t = array(datos$t,dim=1),
-  temp_obs= array(datos$temp, dim=1),
-  y = array(log(datos$temp - t_amb), dim=1)
+stan_data1 <- list(
+  N = nrow(datos1),
+  t = array(datos1$t,dim=1),
+  temp_obs= array(datos1$temp, dim=1),
+  y = array(log(datos1$temp - t_amb), dim=1)
 )
-str(stan_data)
-stan_model <- stan(
-  file = "modelo.stan",
+
+# str(stan_data1)
+
+stan_model1 <- stan(
+  file = "modelo1.stan",
   chains = 4,
-  data = stan_data,
+  data = stan_data1,
   refresh = 1,
-  seed = 200,
+  seed = 20000,
   iter=2000,
   warmup = 1000,
   control = list(adapt_delta = 0.95)
 )
-stan_model
 
+summary(stan_model1)
+```
+
+Nuestro modelo actualizado con 1 obs es:
+
+$$
+\begin{cases}
+\ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
+\mu = \beta_{0} + \beta_{1}\cdot t \\
+\\
+\beta_0 \sim \mathcal{N}_{(2.705, 0.012)} \\
+\beta_1 \sim \mathcal{N}_{(-0.15, 0.017)} \\
+\sigma \sim \mathcal{N}^{+}_{(0.427)}
+\end{cases}
+$$
+
+```{r}
+# Evaluamos la calidad de las muestras
 mcmc_trace(
-  stan_model, 
+  stan_model1, 
   pars = c("beta0", "beta1", "sigma"),
   facet_args = list(nrow = 3)
 )
+```
 
+Las cadenas parece que convergen todas
+
+Evaluamos la calidad predictiva del nuevo modelo
+
+```{r}
+mu_b0 <- 2.705
+sigma_b0 <- 0.012
+mu_b1 <- -0.15
+sigma_b1 <- 0.017
+
+observaciones <- tibble(tiempo = c(0, 1.5, 6.75),
+                        y = c(2.38,2.14,0.53))
+
+parametros <-
+  expand.grid(b0 = seq(mu_b0-(3*sigma_b0), mu_b0+(3*sigma_b0),length.out = 100),
+              b1 = seq(mu_b1-(3*sigma_b1), mu_b1+(3*sigma_b1),length.out = 100)) |>
+  mutate(prior = purrr::map2_dbl(
+    b0, b1,~mvtnorm::dmvnorm(x = c(.x,.y),
+                                   mean = c(mu_b0, mu_b1),
+                                   sigma = diag(c(sigma_b0, sigma_b1),2))))
+
+rectas_prior <- 
+  ggplot(data = observaciones) +
+  geom_point(aes(x=tiempo, y=y), size = 3, color = 'firebrick3') +
+  geom_abline(data = parametros %>%
+  slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
+  lims(x=c(-2,7),y=c(0.4,3)) +
+  theme_bw() +
+  labs(caption = 'Figura 3: rectas predictivas a posteriori con el modelo 1')
+
+rectas_prior
+```
+Las Figuras 2 y 3 son practicamente iguales porque el modelo no cambia para $\beta_0$ y $\beta_1$
+
+```{r, eval=FALSE}
 datos_transf <- data.frame(
   t = c(1.5),
   temp = c(log(30.5-22))
@@ -302,17 +336,14 @@ recorren bien la distri
 es amplio el intervalo de prediccion de horario de muerte. tiene sentido porque el posterior se calculo con una sola observacion. 
 va aprox entre -2.5 y 0 (esto es dos horas con 30 minutos)
 
-este codigo no funciona:
+## Modelo con 2 obs
+
 
 ```{r, eval=FALSE}
 datos2 <- data.frame(
-  t = c(0,1.5),
-  temp = c(32.8,30.5)
+  t = c(0, 1.5),
+  temp = c(32.8, 30.5)
 )
-
-
-
-
 
 stan_data2 <- list(
   N = nrow(datos2),
@@ -320,19 +351,70 @@ stan_data2 <- list(
   temp_obs= datos2$temp,
   y = log(datos2$temp - t_amb)
 )
+
 str(stan_data2)
+
 stan_model2 <- stan(
-  file = "modelo.stan",
+  file = "modelo1.stan",
   chains = 4,
   data = stan_data2,
   refresh = 1,
-  seed = 200,
+  seed = 20000,
   iter= 2500,
   warmup = 1000,
   control = list(adapt_delta = 0.95)
 )
-stan_model2
 
+summary(stan_model2)
+```
+
+Ahora, el modelo actualizado es:
+
+$$
+\begin{cases}
+\ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
+\mu = \beta_{0} + \beta_{1}\cdot t \\
+\\
+\beta_0 \sim \mathcal{N}_{(2.704, 0.012)} \\
+\beta_1 \sim \mathcal{N}_{(-0.15, 0.017)} \\
+\sigma \sim \mathcal{N}^{+}_{(0.33)}
+\end{cases}
+$$
+
+Evaluamos la calidad predictiva del nuevo modelo
+
+```{r}
+mu_b0 <- 2.704
+sigma_b0 <- 0.012
+mu_b1 <- -0.15
+sigma_b1 <- 0.017
+
+observaciones <- tibble(tiempo = c(0, 1.5, 6.75),
+                        y = c(2.38,2.14,0.53))
+
+parametros <-
+  expand.grid(b0 = seq(mu_b0-(3*sigma_b0), mu_b0+(3*sigma_b0),length.out = 100),
+              b1 = seq(mu_b1-(3*sigma_b1), mu_b1+(3*sigma_b1),length.out = 100)) |>
+  mutate(prior = purrr::map2_dbl(
+    b0, b1,~mvtnorm::dmvnorm(x = c(.x,.y),
+                                   mean = c(mu_b0, mu_b1),
+                                   sigma = diag(c(sigma_b0, sigma_b1),2))))
+
+rectas_prior <- 
+  ggplot(data = observaciones) +
+  geom_point(aes(x=tiempo, y=y), size = 3, color = 'firebrick3') +
+  geom_abline(data = parametros %>%
+  slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
+  lims(x=c(-2,7),y=c(0.4,3)) +
+  theme_bw() +
+  labs(caption = 'Figura 3: rectas predictivas a posteriori con el modelo 1')
+
+rectas_prior
+```
+
+este codigo no funciona:
+
+```{r, eval=FALSE}
 mcmc_trace(
   stan_model2, 
   pars = c("beta0", "beta1", "sigma"),
@@ -381,30 +463,72 @@ media beta0 = 2.5 sd= 0.06
 
 ```{r, eval=FALSE}
 #Se arma una tabla con las temperaturas del cuerpo observadas y los tiempos
-datos <- data.frame(
+datos3 <- data.frame(
   t = c(0, 1.5, 6.75),
   temp = c(32.8, 30.5, 23.7)
 )
 
-
-
 t_amb <- 22
 
-stan_data <- list(
-  N = nrow(datos),
-  t = datos$t,
-  temp_obs= datos$temp,
-  y = log(datos$temp - t_amb)
+stan_data3 <- list(
+  N = nrow(datos3),
+  t = datos3$t,
+  temp_obs= datos3$temp,
+  y = log(datos3$temp - t_amb)
 )
 
-stan_model <- stan(
-  file = "modelo.stan",
+str(stan_data3)
+
+stan_model3 <- stan(
+  file = "modelo1.stan",
   chains = 4,
-  data = stan_data,
+  data = stan_data3,
   refresh = 1,
-  seed = 200
+  seed = 20000
 )
 
-
+summary(stan_model3)
 ```
 
+Ahora, el modelo actualizado es:
+
+$$
+\begin{cases}
+\ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
+\mu = \beta_{0} + \beta_{1}\cdot t \\
+\\
+\beta_0 \sim \mathcal{N}_{(2.705, 0.012)} \\
+\beta_1 \sim \mathcal{N}_{(-0.15, 0.017)} \\
+\sigma \sim \mathcal{N}^{+}_{(0.33)}
+\end{cases}
+$$
+
+## Cosas que no entiendo y me da cosa borrar
+
+# Punto 5: leer el repo de las diapositivas de clases.(presentaciones -> presentacion_06 -> linea 401 a linea 425)
+
+Se considera a la hora de muerte entre las 4 y las 6
+beta0=ln(temp a las 6.45 - 22)
+temp baja por hora entre 1 y 1.5
+si ocurrio a las 4: 
+si vale 1: 
+maximo: 37.2 - 2.45=34.75
+minimo 36.1 - 2.45=33.65
+si vale 1.5:
+maximo: 37.2 - 2.45*1.5=33.525
+minimo: 36.1 - 2.45por1.5=*32.425*
+si ocurrio a las 6: 
+si vale 1: 
+maximo: 37.2 - 0.45=*36.75*
+minimo 36.1 - 0.45=35.65
+si vale 1.5:
+maximo: 37.2 - 0.45*1.5=36.525
+minimo: 36.1 - 0.45*1.5=35.426
+
+
+
+cuerpo en la heladera por eso outlier
+
+
+
+Teniendo en cuenta la información cronológica presentada al inicio del trabajo, se presenta la tabla 1 (por ponerle un número). Se considera como $t = 0$ al horario en el que se le registra la temperatura por primera vez al cuerpo de Sergio (6:45hs), mientras que los demás tiempos son la diferencia, en minutos, entre esa hora y la hora en la que se tomán las restantes temperaturas (8:15hs y 13:30hs).
