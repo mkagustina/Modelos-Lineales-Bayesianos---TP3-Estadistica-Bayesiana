@@ -17,7 +17,6 @@ title: |
   \vspace{4cm}
   \begin{flushright}
     \includegraphics[width=4cm]{chuky.png}
-  \end{flushright}
 author: |
   Alumnas: Agustina Mac Kay, Ailén Salas y Rocío Canteros ayudando a Guido el cordobés
 date: "Año 2024"
@@ -55,7 +54,7 @@ Desde entonces el pobre Guido entró en shock. Su psicóloga le dijo que perdió
 
 ## Objetivo 
 
-El objetivo de este trabajo es averiguar la hora de muerte de Sergio Contreras, quien murió desangrado, producto de una herida punzante recibida en el bazo, en su casa en la localidad cordobesa de Salsipuedes.
+El objetivo de este trabajo es averiguar la hora de muerte de Sergio Contreras, quien murió desangrado, producto de una herida punzante recibida en el bRazo, en su casa en la localidad cordobesa de Salsipuedes.
 
 ## Metodología
 
@@ -90,7 +89,9 @@ $$\frac{dT(t)}{dt}=r[T_{amb}-T(T)]\tag{1}$$
 
 donde   
 $T(t)$ es la temperatura del cuerpo en el tiempo $t$.
-$T_{amb}$ es la temperatura ambiente
+
+$T_{amb}$ es la temperatura ambiente.
+
 $r$ es una constante de proporcionalidad que depende de las características del cadáver y del ambiente.
 
 Una posible solución de la ecuación diferencial da la temperatura del cadáver en función del tiempo viene dada por:
@@ -191,7 +192,7 @@ Si se considera la temperatura normal del cuerpo humano en 36.5 ºC, entonces el
 A partir de esto, se puede suponer a priori una distribución normal para $\beta_0$ de media $\mu_{\beta_0} = \frac{2.526 + 2.14}{2}=2.333$ y desvío $\sigma_{\beta_0} = \frac{2.526-2.333}{3} = 0.064$, quedando así definido su prior.
 
 Para definir una distribución para $\beta_1$, se puede utilizar la Figura 1; si bien el gráfico se realizó para una temperatura ambiente 1 ºC más alta que la actual, las conclusiones no deberían cambiar tanto.
-Si en una situación de causa de muerte natural, un valor lógico para *r* se encuentra entre 0.1 y 0.2. Entonces, se puede considerar que como Sergio murió desangrado y la pérdida de sangre puede acelerar el descenso de la temperatura corporal, un valor razonable para *r* sea entre 0.15 y 0.3.
+Si en una situación de causa de muerte natural, un valor lógico para *r* se encuentra entre 0.1 y 0.2. Entonces, se puede considerar que como Sergio murió desangrado y la pérdida de sangre puede acelerar el descenso de la temperatura corporal, un valor razonable para *r* será entre 0.15 y 0.3.
 De esta manera, se puede decir que $\beta_1 = -r$ toma valores entre -0.3 y -0.15.
 Por eso se propone a priori una distribución normal de media $\mu_{\beta_1} = \frac{-0.3-0.15}{2} = -0.225$ y desvío $\sigma_{\beta_1} = \frac{-0.15+0.225}{3} = 0.025$.
 
@@ -240,7 +241,8 @@ rectas_prior <-
   # lims(x=c(-2,7),y=c(0.4,3)) +
   lims ( x= c(-3,7.5),y=c(0.5,4)) +
   theme_bw() +
-  labs(caption = 'Figura 2: rectas predictivas a priori')
+  labs(caption = 'Figura 2: rectas predictivas a priori')+
+  theme(plot.caption = element_text(hjust = 0.5))
 
 rectas_prior
 ```
@@ -251,7 +253,8 @@ Esto puede deberse a que, si bien se probó que el logaritmo natural $T(t) - T_{
 
 #### Primer observación
 
-Utilizando la información disponible hasta las 7 de la mañanae, se actualiza el modelo. Se cuenta únicamente con un solo dato: la temperatura del cuerpo de Sergio en la primer medición (6:45hs) fue de 32.8ºC.
+
+Utilizando la información disponible hasta las 7 de la mañana, se actualiza el modelo. Se cuenta únicamente con un solo dato: la temperatura del cuerpo de Sergio en la primer medición (6:45hs) fue de 32.8ºC.
 
 ```{r, warning=FALSE, results='hide', message=FALSE}
 # Modelo actualizado con 1 sola observación
@@ -278,7 +281,7 @@ stan_model1 <- stan(
   refresh = 1,
   seed = 20000,
   iter=3000,
-  warmup = 1500,
+  warmup = 1000,
   control = list(adapt_delta = 0.95)
 )
 
@@ -289,38 +292,40 @@ $$
 \begin{array}{c|cc|cc}
 \text{Parámetro} &\text{Media} &\text{desvío} & \hat{R} & \text{Número efectivo de muestras} \\
 \hline
-\beta_0 & 2.344 & 0.059 & 1.0009 & 2746 \\
-\beta_1 & -0.20 & 0.033 & 1.0005 & 3174 \\
-\sigma & 0.347 & 0.383 & 1.0016 & 3275 \\
+\beta_0 & 2.345 & 0.058 & 1.0002 & 4111 \\
+\beta_1 & -0.22 & 0.025 & 1.0006 & 4630 \\
+\sigma & 0.343 & 0.383 & 1.0005 & 3919 \\
 \end{array}
-$$ Los 3 parámetros tienen buen $\hat{R}$ y un número efectivo de muestras muy alto.
+$$ 
+Los 3 parámetros tienen buen $\hat{R}$ y un número efectivo de muestras muy alto. Además, se aprecia en la Figura 3 que las cadenas, en cada trace plot, se mezclan entre si indicando que son similares y recorren bien la distribución establecida para los parámetros.
 
-Trace plots:
-### LLEGUE HASTA ACA
-```{r, message=FALSE, warning=FALSE}
+
+```{r, message=FALSE, warning=FALSE, fig.width=7}
 # Evaluamos la calidad de las muestras
 mcmc_trace(
   stan_model1, 
   pars = c("beta0", "beta1", "sigma"),
-  facet_args = list(nrow = 3)
-)
+  facet_args = list(nrow = 3), 
+) +
+  labs(caption = "Figura 3: Trace plot por parámetro") +
+  theme(plot.caption = element_text(hjust = 0.5))
+
+
 ```
 
-Las cadenas parece que convergen todas
-
-Entonces, el modelo a posteriori con 1 observación es:
+Por lo que, considerando solo 1 observación, el modelo se renueva y queda definido de la siguiente manera:
 
 $$
 \begin{cases}
 \ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
 \mu = \beta_{0} + \beta_{1}\cdot t \\
 \\
-\beta_0 \sim \mathcal{N}_{(2.344, 0.059)} \\
-\beta_1 \sim \mathcal{N}_{(-0.2, 0.033)} \\
-\sigma \sim \mathcal{N}^{+}_{(????)}
+\beta_0 \sim \mathcal{N}_{(2.345, 0.058)} \\
+\beta_1 \sim \mathcal{N}_{(-0.22, 0.025)} \\
+\sigma \sim \mathcal{N}^{+}_{(0.383)}
 \end{cases}
 $$
-
+Con él (el modelo) se realizan curvas *a posteriori* para poder dar una primera aproximación sobre la hora de muerte de Sergio.
 ```{r}
 # Primera observacion
 datos_transf1 <- data.frame(
@@ -379,21 +384,21 @@ rectas_posterior1 <-
   geom_hline(yintercept = 36.5, linetype = "dashed")  +
   geom_point(data=observaciones, aes(x=tiempo, y=exp(y)+22), size = 3) +
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
-  geom_vline(xintercept = lim_inf1) +
-  geom_vline(xintercept = lim_sup1) +
-  labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
+  geom_vline(xintercept = lim_inf1, linetype = "dashed", color = "indianred1") +
+  geom_vline(xintercept = lim_sup1, linetype = "dashed", color = "indianred1") +
+  labs(x="Tiempo en horas",y="T(t)", caption = "Figura 4: Curvas a posteriori")+
   scale_x_continuous( breaks = seq(-4, 8, by = 2), labels = seq(2.45, 14.45, by = 2),expand = c(0, 0)) +
-  theme_bw()
+  theme_bw() +
+  theme(plot.caption = element_text(hjust = 0.5))
 
 
 rectas_posterior1
 ```
+Según la Figura 4, Sergio se habría muerto entre aproximadamente las 3:45hs y las 6:00hs. Este es un intervalo muy grande de tiempo y Guido sabe que sus superiores lo mirarán de mala manera si él informa ese lapso de tiempo, por lo que brinda a sus "ayudantes" un poco más de información para ver si se logra achicar el intervalo.
 
-Según este nuevo modelo, Serio murió entre el tiempo -0.3 y 0.3.
-Malísimo.
-Una sola observación no fue suficiente para "bajar" el b0
 
-## Modelo con 2 obs
+### Dos cabezas piensan mejor que una
+Ahora se conocen datos que fueron recabados entre las 7 y las 10 de la mañana y se suma una observación para actualizar el modelo: la segunda medición al cuerpo de Sergio (realizada a las 8:15hs) arrojó una temperatura corporal de 30.5°C.
 
 ```{r, results='hide'}
 datos2 <- data.frame(
@@ -416,7 +421,7 @@ stan_model2 <- stan(
   data = stan_data2,
   refresh = 1,
   seed = 20000,
-  iter= 2500,
+  iter= 3000,
   warmup = 1500,
   control = list(adapt_delta = 0.95)
 )
@@ -428,20 +433,21 @@ $$
 \begin{array}{c|cc|cc}
 \text{Parámetro} &\text{Media} &\text{desvío} & \hat{R} & \text{Número efectivo de muestras} \\
 \hline
-\beta_0 & 2.362 & 0.048 & 1.005 & 1242 \\
-\beta_1 & -0.16 & 0.031 & 1.006 & 1157 \\
-\sigma & 0.162 & 0.214 & 1.004 & 1021 \\
+\beta_0 & 2.362 & 0.058 & 1.0007 & 2173 \\
+\beta_1 & -0.216 & 0.026 & 1.003 & 1908 \\
+\sigma & 0.231 & 0.253 & 1.0003 & 2493 \\
 \end{array}
 $$
-
-El número efectivo de muestras ya no es tan grande pero el $\hat{R}$ sigue siendo bueno.
+Nuevamente se obtienen buenos $\hat{R}$ para los 3 parámetros pero el número efectivo de muestras se ve disminuido en relación al apartado anterior ("Primer observación).
 
 ```{r, eval=FALSE}
 mcmc_trace(
   stan_model2, 
   pars = c("beta0", "beta1", "sigma"),
   facet_args = list(nrow = 3)
-)
+) +
+  labs(caption = "Figura 5: Trace plot por parámetro -Modelo n°2-") +
+  theme(plot.caption = element_text(hjust = 0.5))
 ```
 
 todas mezcladas.
@@ -667,11 +673,7 @@ Las enfermedades crónicas aceleran el enfriamiento del cuerpo, mientras que otr
 
 [^3]: Fuente: [\textcolor{blue}{\underline{Fenómenos cadavéricos y el tanatocronodiagnóstico}}](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.uv.es/gicf/3R1_Pen%CC%83a_GICF_31.pdf)
 
-<<<<<<< HEAD
+
 Si Sergio hubiese tenido una enfermedad crónica al momento de su muerte, se deberían modificar las distribuciones a priori para $\beta_0$ y $\beta_1$ de modo que sus medias sean menores. 
 
 En caso de que el hombre haya tenido fiebre, también se deberían modificar los priors de $\beta_0$ y $\beta_1$. En el caso de $\beta_0$ hay que considerar que la temperatura del cuerpo al momento de la muerte ya no es la habitual del cuerpo humano(36.5ºC), sino que ronda los 38 y 39ºC. Luego, $\beta_1$ debería tener una media menor, para permitir que el descenso de la temperatura sea más rápido en las primeras horas postmortem.
-
-=======
-Si Sergio hubiese tenido una enfermedad al momento de su muerte, se deberían modificar las distribuciones a priori para $\beta_1$ y $\beta_0$ de modo que sus medias sean menores.
->>>>>>> 0cd57471837907b69eedd88a1f2a1c7cad079eca
