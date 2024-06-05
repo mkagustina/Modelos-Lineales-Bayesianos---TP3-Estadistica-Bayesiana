@@ -622,17 +622,13 @@ rectas_posterior3
 
 Sergio se murió...
 
-## ¿What if... Sergio estaba enfermo?
+## What if... Sergio estaba enfermo?
 
 Fue mencionado anteriormente que la pérdida de sangre por hemorragia puede acelerar el enfriamiento del cadáver. Otro factor a considerar es la presencia de enfermedades. Las enfermedades crónicas aceleran el enfriamiento del cuerpo, mientras que otras, como la fiebre, lo retardan.[^3]
 
 [^3]: Fuente: [\textcolor{blue}{\underline{Fenómenos cadavéricos y el tanatocronodiagnóstico}}](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.uv.es/gicf/3R1_Pen%CC%83a_GICF_31.pdf)
 
-Si Sergio hubiese tenido una enfermedad al momento de su muerte, se deberían modificar las distribuciones a priori para $\beta_1$ y $\beta_0$ de modo que sus medias sean menores. 
+Si Sergio hubiese tenido una enfermedad crónica al momento de su muerte, se deberían modificar las distribuciones a priori para $\beta_0$ y $\beta_1$ de modo que sus medias sean menores. 
 
-
-
-
-
-
+En caso de que el hombre haya tenido fiebre, también se deberían modificar los priors de $\beta_0$ y $\beta_1$. En el caso de $\beta_0$ hay que considerar que la temperatura del cuerpo al momento de la muerte ya no es la habitual del cuerpo humano(36.5ºC), sino que ronda los 38 y 39ºC. Luego, $\beta_1$ debería tener una media menor, para permitir que el descenso de la temperatura sea más rápido en las primeras horas postmortem.
 
