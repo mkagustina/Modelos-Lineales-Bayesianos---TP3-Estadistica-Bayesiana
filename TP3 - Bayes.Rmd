@@ -343,12 +343,10 @@ rectas_posterior1 <-
   geom_hline(yintercept = 36.5, linetype = "dashed")  +
   geom_point(data=observaciones, aes(x=tiempo, y=exp(y)+22), size = 3) +
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
-  geom_vline(xintercept = lim_inf1, linetype = "dashed", color = "firebrick1") +
-  geom_vline(xintercept = lim_sup1, linetype = "dashed", color = "firebrick1") +
-    annotate("text", x = lim_inf1, y = 25, label = paste("x = 3.41"), color = "black", angle = 90, vjust = -0.5) +
-  annotate("text", x = lim_sup1, y = 25, label = paste("x = 6.10"), color = "black", angle = 90, vjust = -0.5) +
-  labs(x="Horario(hs)",y="T(t)", caption = "figura xxxxxxxxxx")+
-  scale_x_continuous( breaks = seq(-3.75, 6.25, by = 2), labels = seq(3, 13, by = 2),expand = c(0, 0)) +
+  geom_vline(xintercept = lim_inf1) +
+  geom_vline(xintercept = lim_sup1) +
+  labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
+  scale_x_continuous( breaks = seq(-4, 8, by = 2), labels = seq(2.45, 14.45, by = 2),expand = c(0, 0)) +
   theme_bw()
 
 
@@ -479,12 +477,10 @@ rectas_posterior2 <-
   geom_hline(yintercept = 36.5, linetype = "dashed")  +
   geom_point(data=observaciones, aes(x=tiempo, y=exp(y)+22), size = 3) +
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
-  geom_vline(xintercept = lim_inf2, linetype = "dashed", color = "firebrick1") +
-  geom_vline(xintercept = lim_sup2, linetype = "dashed", color = "firebrick1") +
-  annotate("text", x = lim_inf2, y = 25, label = paste("x = 4.06"), color = "black", angle = 90, vjust = -0.5) +
-  annotate("text", x = lim_sup2, y = 25, label = paste("x = 6.12"), color = "black", angle = 90, vjust = -0.5) +
-   labs(x="Horario(hs)",y="T(t)", caption = "figura xxxxxxxxxx")+
- scale_x_continuous( breaks = seq(-3.75, 6.25, by = 2), labels = seq(3, 13, by = 2),expand = c(0, 0)) +
+  geom_vline(xintercept = lim_inf2) +
+  geom_vline(xintercept = lim_sup2) +
+  labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
+ scale_x_continuous( breaks = seq(-4, 8, by = 2), labels = seq(2.45, 14.45, by = 2),expand = c(0, 0)) +
   theme_bw()
 
 rectas_posterior2
@@ -615,16 +611,28 @@ rectas_posterior3 <-
             alpha = 0.3, size = 1) +
   geom_hline(yintercept = 36.5, linetype = "dashed")  +
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
-  geom_vline(xintercept = lim_inf3, linetype = "dashed", color = "firebrick1") +
-  geom_vline(xintercept = lim_sup3, linetype = "dashed", color = "firebrick1") +
-  annotate("text", x = lim_inf3, y = 25, label = paste("x = 3.43"), color = "black", angle = 90, vjust = -0.5) +
-  annotate("text", x = lim_sup3, y = 25, label = paste("x = 6.07"), color = "black", angle = 90, vjust = -0.5) +
-  labs(x="Horario(hs)",y="T(t)", caption = "figura xxxxxxxxxx")+
- scale_x_continuous( breaks = seq(-3.75, 6.25, by = 2), labels = seq(3, 13, by = 2),expand = c(0, 0)) +
+  geom_vline(xintercept = lim_inf3) +
+  geom_vline(xintercept = lim_sup3) +
+  labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
+ scale_x_continuous( breaks = seq(-4, 8, by = 2), labels = seq(2.45, 14.45, by = 2),expand = c(0, 0)) +
   theme_bw()
 
 rectas_posterior3
 ```
 
 Sergio se murió...
+
+## ¿What if... Sergio estaba enfermo?
+
+Fue mencionado anteriormente que la pérdida de sangre por hemorragia puede acelerar el enfriamiento del cadáver. Otro factor a considerar es la presencia de enfermedades. Las enfermedades crónicas aceleran el enfriamiento del cuerpo, mientras que otras, como la fiebre, lo retardan.[^3]
+
+[^3]: Fuente: [\textcolor{blue}{\underline{Fenómenos cadavéricos y el tanatocronodiagnóstico}}](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.uv.es/gicf/3R1_Pen%CC%83a_GICF_31.pdf)
+
+Si Sergio hubiese tenido una enfermedad al momento de su muerte, se deberían modificar las distribuciones a priori para $\beta_1$ y $\beta_0$ de modo que sus medias sean menores. 
+
+
+
+
+
+
 
