@@ -520,18 +520,17 @@ stan_model3 <- stan(
 summary(stan_model3)
 ```
 
-Ahora, el modelo actualizado es:
+$$
+\begin{array}{c|cc|cc}
+\text{Parámetro} &\text{Media} &\text{desvío} & \hat{R} & \text{Número efectivo de muestras} \\
+\hline
+\beta_0 & 2.333 & 0.061 & 1.001 & 2883 \\
+\beta_1 & -0.23 & 0.029 & 1.008 & 1744 \\
+\sigma & 0.334 & 0.232 & 1.006 & 1981 \\
+\end{array}
+$$
 
-$$
-\begin{cases}
-\ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
-\mu = \beta_{0} + \beta_{1}\cdot t \\
-\\
-\beta_0 \sim \mathcal{N}_{(2.705, 0.012)} \\
-\beta_1 \sim \mathcal{N}_{(-0.15, 0.017)} \\
-\sigma \sim \mathcal{N}^{+}_{(0.33)}
-\end{cases}
-$$
+Los $\hat{R}$ son todos buenos y los números efectivos de muestras también.
 
 ```{r, eval=FALSE}
 mcmc_trace(
@@ -545,6 +544,20 @@ todas mezcladas. eso es bueno. el sigma no esta tan bueno. RARI
 recorren bien la distri
 
 La muestra parece ser buena
+
+Ahora, el modelo actualizado es:
+
+$$
+\begin{cases}
+\ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
+\mu = \beta_{0} + \beta_{1}\cdot t \\
+\\
+\beta_0 \sim \mathcal{N}_{(2.333, 0.061)} \\
+\beta_1 \sim \mathcal{N}_{(-0.23, 0.029)} \\
+\sigma \sim \mathcal{N}^{+}_{(???)}
+\end{cases}
+$$
+
 
 ```{r}
 datos_transf3 <- data.frame(
