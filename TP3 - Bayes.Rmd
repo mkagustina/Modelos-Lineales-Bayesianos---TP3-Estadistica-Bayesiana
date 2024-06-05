@@ -248,19 +248,18 @@ stan_model1 <- stan(
 summary(stan_model1)
 ```
 
-Lo único que cambia es la distribución de sigma.
-Nuestro modelo actualizado con 1 obs es:
+$$
+\begin{array}{c|cc|cc}
+\text{Parámetro} &\text{Media} &\text{desvío} & \hat{R} & \text{Número efectivo de muestras} \\
+\hline
+\beta_0 & 2.344 & 0.059 & 1.0009 & 2746 \\
+\beta_1 & -0.20 & 0.033 & 1.0005 & 3174 \\
+\sigma & 0.347 & 0.383 & 1.0016 & 3275 \\
+\end{array}
+$$
+Los 3 parámetros tienen buen $\hat{R}$ y un número efectivo de muestras muy alto.
 
-$$
-\begin{cases}
-\ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
-\mu = \beta_{0} + \beta_{1}\cdot t \\
-\\
-\beta_0 \sim \mathcal{N}_{(2.705, 0.012)} \\
-\beta_1 \sim \mathcal{N}_{(-0.15, 0.017)} \\
-\sigma \sim \mathcal{N}^{+}_{(0.427)}
-\end{cases}
-$$
+Trace plots:
 
 ```{r}
 # Evaluamos la calidad de las muestras
@@ -272,6 +271,19 @@ mcmc_trace(
 ```
 
 Las cadenas parece que convergen todas
+
+Entonces, el modelo a posteriori con 1 observación es:
+
+$$
+\begin{cases}
+\ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
+\mu = \beta_{0} + \beta_{1}\cdot t \\
+\\
+\beta_0 \sim \mathcal{N}_{(2.344, 0.059)} \\
+\beta_1 \sim \mathcal{N}_{(-0.2, 0.033)} \\
+\sigma \sim \mathcal{N}^{+}_{(????)}
+\end{cases}
+$$
 
 ```{r}
 # Primera observacion
