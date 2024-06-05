@@ -47,13 +47,23 @@ set.seed(425641446)
 
 ## Introducción
 
-Guido es un estudiante de estadística que, por ser fanático de CSI: Crime Scene Investigations hoy cumple su sueño formando parte de la policía científica de Córdoba. Pero no todo es color de rosa. En realidad, Guido está viviendo una pesadilla traumática desde la madrugada del pasado miércoles, cuando su unidad de Salsipuedes fue convocada para investigar un crimen que, aparentemente, acababa de ser cometido. 
+Guido es un estudiante de estadística que, por ser fanático de CSI: Crime Scene Investigations hoy cumple su sueño formando parte de la policía científica de Córdoba.
+Pero no todo es color de rosa.
+En realidad, Guido está viviendo una pesadilla traumática desde la madrugada del pasado miércoles, cuando su unidad de Salsipuedes fue convocada para investigar un crimen que, aparentemente, acababa de ser cometido.
 
-Al llegar al lugar, el caos se extendía por toda la habitación. Muebles volcados y destrozados, utensilios de cocina desparramados y manchados con sangre, vidrios estallados y manchas de sangre en las paredes y en el piso. Guido se encontraba paralizado. Su respiración era agitada y sus manos transpiraban. Cuando creía que esta era la peor película de terror de su vida.. Ahí estaba, el cuerpo de Sergio Contreras ahogándose en un charco de sangre. 
+Al llegar al lugar, el caos se extendía por toda la habitación.
+Muebles volcados y destrozados, utensilios de cocina desparramados y manchados con sangre, vidrios estallados y manchas de sangre en las paredes y en el piso.
+Guido se encontraba paralizado.
+Su respiración era agitada y sus manos transpiraban.
+Cuando creía que esta era la peor película de terror de su vida..
+Ahí estaba, el cuerpo de Sergio Contreras ahogándose en un charco de sangre.
 
-En ese momento Guido entró en shock. Su psicóloga le dijo que por ello perdió sus conocimientos de estadística, pero que con el tiempo volverán. Mientras tanto, dado que por suerte nosotras no perdimos nuestros conocimientos estadísticos, el cordobés nos pidió ayuda para resolver el caso. Para que Guido no pierda su trabajo, nos ponemos más serias.
+En ese momento Guido entró en shock.
+Su psicóloga le dijo que por ello perdió sus conocimientos de estadística, pero que con el tiempo volverán.
+Mientras tanto, dado que por suerte nosotras no perdimos nuestros conocimientos estadísticos, el cordobés nos pidió ayuda para resolver el caso.
+Para que Guido no pierda su trabajo, nos ponemos más serias.
 
-## Objetivo 
+## Objetivo
 
 El objetivo de este trabajo es averiguar la hora de muerte de Sergio Contreras, quien murió desangrado, producto de una herida punzante recibida en el bazo, en su casa en la localidad cordobesa de Salsipuedes.
 
@@ -70,7 +80,7 @@ En este proceso, la temperatura del cadáver desciende hasta igualarse con la te
 
 \newpage
 
-##  Resumen de los hechos ocurridos
+## Resumen de los hechos ocurridos
 
 Para resolver la interrogante de este trabajo, se cuenta con la siguiente cronología de hechos:
 
@@ -90,12 +100,11 @@ donde $T(t)$ es la temperatura del cuerpo en el tiempo $t$, $T_{amb}$ es la temp
 
 Una posible solución a esta ecuación viene dada por:
 
-$$T(t)=T_{\mathrm{amb}}+(T_i-T_{\mathrm{amb}})e^{-kt}$$
-donde
-$T_i$ es la temperatura inicial del cadáver.
+$$T(t)=T_{\mathrm{amb}}+(T_i-T_{\mathrm{amb}})e^{-kt}$$ donde $T_i$ es la temperatura inicial del cadáver.
 
-La misma satisface la ecuación $(1)$ ya que: 
+La misma satisface la ecuación $(1)$ ya que:
 
+```{=tex}
 \begin{align*}
 \frac{dT(t)}{dt} &= (T_i - T_{\text{amb}}) \cdot (-r) \cdot e^{-rt} \\
 &= -r \cdot [(T_i - T_{\mathrm{amb}}) \cdot e^{-rt}] \\
@@ -103,8 +112,9 @@ La misma satisface la ecuación $(1)$ ya que:
 &= -r \cdot [-T_{\mathrm{amb}} + T(t)] \\
 &= r \cdot [T_{\mathrm{amb}} - T(t)]
 \end{align*}
-
-Con el objetivo de obtener un valor realista de $r$, se grafica la función $T(t)$ con distintos valores de esta constante. Para esto, se considera una temperatura inicial del cuerpo de 37 Cº y una temperatura ambiente de 23 Cº.
+```
+Con el objetivo de obtener un valor realista de $r$, se grafica la función $T(t)$ con distintos valores de esta constante.
+Para esto, se considera una temperatura inicial del cuerpo de 37 Cº y una temperatura ambiente de 23 Cº.
 
 ```{r, fig.align='center'}
 # Gráfico de la temperatura del cuerpo a través del tiempo
@@ -140,14 +150,19 @@ ggplot(df_T) +
   theme(plot.caption = element_text(hjust = 0.5))
 ```
 
-Como se mencionó anteriormente, *r* es una constante de proporcionalidad que depende de las características del cadáver y del ambiente. Ésta, representa la conductividad entre el cuerpo y la superficie de contacto. A valores más altos de *r*, más rápido será el descenso de la temperatura corporal.
+Como se mencionó anteriormente, *r* es una constante de proporcionalidad que depende de las características del cadáver y del ambiente.
+Ésta, representa la conductividad entre el cuerpo y la superficie de contacto.
+A valores más altos de *r*, más rápido será el descenso de la temperatura corporal.
 
 Los órganos abdominales pueden mantener el calor por al menos 24 horas.
 En las primeras 12 horas se va perdiendo el calor de 0.8 a 1.0 °C por hora y en las siguientes 12 horas de 0.3 a 0.5 grados centígrados.[^2]
 
 [^2]: Fuente: [\textcolor{blue}{\underline{Fenómenos cadavéricos - Valentina Gómez Hernández}}](https://repository.unad.edu.co/bitstream/handle/10596/51040/vgomezh.pdf?sequence=3&isAllowed=y#:~:text=Enfriamiento%20Cadav%C3%A9rico%20o%20Algor%20Mortis,equilibra%20con%20el%20medio%20ambiente.)
 
-Sin embargo, el cuerpo de Sergio no está sufriendo un enfriamiento postmortem regular, puesto que falleció desangrado. La sangre retiene calor y distribuye la temperatura uniformemente en el cuerpo. Sin sangre, el cuerpo pierde calor más rápidamente. Esto podría llevar a pensar que la constante de proporcionalidad sea un poco más alta que en una situación de muerte por causa natural.
+Sin embargo, el cuerpo de Sergio no está sufriendo un enfriamiento postmortem regular, puesto que falleció desangrado.
+La sangre retiene calor y distribuye la temperatura uniformemente en el cuerpo.
+Sin sangre, el cuerpo pierde calor más rápidamente.
+Esto podría llevar a pensar que la constante de proporcionalidad sea un poco más alta que en una situación de muerte por causa natural.
 
 Teniendo en cuenta esta información y lo observado en la Figura 1, se puede considerar que un valor razonable para *r* se encuentra entre 0.1 y 0.3.
 
@@ -160,11 +175,10 @@ Se demuestra a continuación un resultado que será de vital importancia para la
 
 $$ \ln(T(t) - T_{\mathrm{amb}}) = \ln( T_{\mathrm{diff}} \cdot e^{-rt}) = \ln(T_{\mathrm{diff}}) + (-rt) \cdot \ln (e) = \ln(T_{\mathrm{diff}}) - rt = \beta_{0} + \beta_{1}\cdot t \tag{2}$$
 
-Dado que se desconoce la hora de muerte de Sergio, se toma como momento 0 al tiempo en el que ocurre la primer medición de temperatura al cuerpo. 
+Dado que se desconoce la hora de muerte de Sergio, se toma como momento 0 al tiempo en el que ocurre la primer medición de temperatura al cuerpo.
 
-De esta manera, se puede interpretar a $\beta_{0}$ como el valor del $\ln(T(t) - T_{\mathrm{amb}})$ al momento de la primer medición, es decir, cuando $t=0$. Al exponenciar ambos miembros se obtiene que 
-$$ T(t=0) - T_{\mathrm{amb}} = e^{\beta_0}$$
-Por lo que la temperatura del cuerpo a las 6:45hs (hora de la primer medición) es igual a $e^{\beta_0} + T_{\mathrm{amb}}$
+De esta manera, se puede interpretar a $\beta_{0}$ como el valor del $\ln(T(t) - T_{\mathrm{amb}})$ al momento de la primer medición, es decir, cuando $t=0$.
+Al exponenciar ambos miembros se obtiene que $$ T(t=0) - T_{\mathrm{amb}} = e^{\beta_0}$$ Por lo que la temperatura del cuerpo a las 6:45hs (hora de la primer medición) es igual a $e^{\beta_0} + T_{\mathrm{amb}}$
 
 $\beta_1$ es el opuesto de la constante de conductividad y representa el cambio en el logaritmo de la diferencia entre la temperatura corporal y la temperatura ambiente por cada hora transcurrida.
 
@@ -184,16 +198,20 @@ Se asignarán distribuciones a priori para los parámetros desconocidos $\beta_0
 Si bien $\mu$ también es desconocido, no se le asigna un prior propio ya que su valor depende exclusivamente de $\beta_0$ y $\beta_1$, de forma que una vez asignados valores para estos dos parámetros, $\mu$ queda definido.
 
 Como se menciona en la ecuación (2), $\beta_0$ es el $\ln(T_{\mathrm{diff}}) = \ln(T_i - T_{\mathrm{amb}})$ cuando $t=0$ (A las 6:45hs).
-Se sabe que la temperatura ambiente es de 22ºC, y que a las 5:33hs la vecina de Sergio escuchó ruidos provenientes de su casa. La primer medición de temperatura se hizo a las 6:45hs. Entonces, se puede pensar que al momento de la primer medición Sergio llevaba muerto entre 1 y 2 horas. En ese tiempo, es de esperar que la temperatura de su cuerpo haya descendido entre 2 y 6 °C, como mucho.
-Si se considera la temperatura normal del cuerpo humano en 36.5 ºC, entonces el $\ln(T(t) - T_{\mathrm{amb}})$ máximo es $\ln((36.5-2) - 22) = 2.526$ y el mínimo es $\ln((36.5-6) - 22) = 2.14$. 
+Se sabe que la temperatura ambiente es de 22ºC, y que a las 5:33hs la vecina de Sergio escuchó ruidos provenientes de su casa.
+La primer medición de temperatura se hizo a las 6:45hs.
+Entonces, se puede pensar que al momento de la primer medición Sergio llevaba muerto entre 1 y 2 horas.
+En ese tiempo, es de esperar que la temperatura de su cuerpo haya descendido entre 2 y 6 °C, como mucho.
+Si se considera la temperatura normal del cuerpo humano en 36.5 ºC, entonces el $\ln(T(t) - T_{\mathrm{amb}})$ máximo es $\ln((36.5-2) - 22) = 2.526$ y el mínimo es $\ln((36.5-6) - 22) = 2.14$.
 A partir de esto, se puede suponer a priori una distribución normal para $\beta_0$ de media $\mu_{\beta_0} = \frac{2.526 + 2.14}{2}=2.333$ y desvío $\sigma_{\beta_0} = \frac{2.526-2.333}{3} = 0.064$, quedando así definido su prior.
 
 Para definir una distribución para $\beta_1$, se puede utilizar la Figura 1; si bien el gráfico se realizó para una temperatura ambiente 1 ºC más alta que la actual, las conclusiones no deberían cambiar tanto.
-Si en una situación de causa de muerte natural, un valor lógico para *r* se encuentra entre 0.1 y 0.2. Entonces, se puede considerar que como Sergio murió desangrado y la pérdida de sangre puede acelerar el descenso de la temperatura corporal, un valor razonable para *r* será entre 0.15 y 0.3.
+Si en una situación de causa de muerte natural, un valor lógico para *r* se encuentra entre 0.1 y 0.2.
+Entonces, se puede considerar que como Sergio murió desangrado y la pérdida de sangre puede acelerar el descenso de la temperatura corporal, un valor razonable para *r* será entre 0.15 y 0.3.
 De esta manera, se puede decir que $\beta_1 = -r$ toma valores entre -0.3 y -0.15.
 Por eso se propone a priori una distribución normal de media $\mu_{\beta_1} = \frac{-0.3-0.15}{2} = -0.225$ y desvío $\sigma_{\beta_1} = \frac{-0.15+0.225}{3} = 0.025$.
 
-Por último, $sigma$ es el desvío del $\ln(T(t) - T_{\mathrm{amb}})$.
+Por último, $\sigma$ es el desvío del $\ln(T(t) - T_{\mathrm{amb}})$.
 La diferencia máxima entre la temperatura ambiente (22ºC) y $T(t)$ se da cuando $T(t)$ es 36.5 °C.
 En ese caso, $\ln(36.5-22)=2.67$.
 La diferencia mínima es de cero grados, y se da cuando la temperatura del cuerpo alcanza la temperatura ambiente, pero ahí el logaritmo no existe.
@@ -210,7 +228,7 @@ $$
 \beta_0 \sim \mathcal{N}_{(2.333, 0.064)} \\
 \beta_1 \sim \mathcal{N}_{(-0.225, 0.025)} \\
 \sigma \sim \mathcal{N}^{+}_{(0.89)}
-\end{cases}
+\end{cases} \tag{3}
 $$ Se realizan pruebas predictivas a priori para este modelo.
 
 ```{r}
@@ -247,10 +265,10 @@ En la figura 2, se puede ver que el prior es bastante compatible con las observa
 También se puede notar que los 3 puntos no están alineados.
 Esto puede deberse a que, si bien se probó que el logaritmo natural $T(t) - T_{\mathrm{amb}}$ es una función lineal de *t*, se está suponiendo que la temperatura ambiente es fija cuando la última medición se realizó habiendo trasladado el cuerpo, por lo que sería raro que la temperatura ambiente realmente se mantenga.
 
-#### Primer observación
+#### Una observación
 
-
-Utilizando la información disponible hasta las 7 de la mañana, se actualiza el modelo. Se cuenta únicamente con un solo dato: la temperatura del cuerpo de Sergio en la primer medición (6:45hs) fue de 32.8ºC.
+Utilizando el modelo con las distribuciones a priori propuesto anteriormente (3) y la información disponible hasta las 7 de la mañana, se actualiza el modelo.
+Se cuenta únicamente con un solo dato: la temperatura del cuerpo de Sergio en la primer medición (6:45hs) fue de 32.8ºC.
 
 ```{r, results='hide'}
 # Modelo actualizado con 1 sola observación
@@ -292,9 +310,10 @@ $$
 \beta_1 & -0.22 & 0.025 & 1.0006 & 4630 \\
 \sigma & 0.343 & 0.383 & 1.0005 & 3919 \\
 \end{array}
-$$ 
+$$
 
-Los 3 parámetros tienen buen $\hat{R}$ y un número efectivo de muestras muy alto. Además, se aprecia en la Figura 3 que las cadenas, en cada trace plot, se mezclan entre si indicando que son similares y recorren bien la distribución establecida para los parámetros.
+Los 3 parámetros tienen buen $\hat{R}$ y un número efectivo de muestras muy alto.
+Además, se aprecia en la Figura 3 que las cadenas, en cada trace plot, se mezclan entre si indicando que son similares y recorren bien la distribución establecida para los parámetros.
 
 ```{r, fig.height = 4}
 # Evaluamos la calidad de las muestras
@@ -321,7 +340,7 @@ $$
 \end{cases}
 $$
 
-Con él (el modelo) se realizan curvas *a posteriori* para poder dar una primera aproximación sobre la hora de muerte de Sergio.
+Se realizan curvas *a posteriori* con el modelo para poder dar una primera aproximación sobre la hora de muerte de Sergio.
 
 ```{r}
 # Primera observacion
@@ -384,18 +403,25 @@ rectas_posterior1 <-
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
   geom_vline(xintercept = lim_inf1, linetype = "dashed", color = "indianred1") +
   geom_vline(xintercept = lim_sup1, linetype = "dashed", color = "indianred1") +
+  annotate("text", x = lim_inf1, y = 28, label = "x = 3.23", 
+           color = "black", vjust = -0.5, angle = 90) +
+  annotate("text", x = lim_sup1, y = 28, label = "x = 6.13", 
+           color = "black", vjust = -0.5, angle = 90) +
   labs(x="Tiempo en horas",y="T(t)", caption = "Figura 4: Curvas a posteriori")+
-  scale_x_continuous( breaks = seq(-4, 8, by = 2), labels = seq(2.45, 14.45, by = 2),expand = c(0, 0)) +
+  scale_x_continuous( breaks = seq(-3.75, 7.75, by = 2), labels = seq(3,13, by = 2),expand = c(0, 0)) +
   theme_bw() +
   theme(plot.caption = element_text(hjust = 0.5))
 
 rectas_posterior1
 ```
 
-Según la Figura 4, Sergio se habría muerto entre aproximadamente las 3:45hs y las 6:00hs. Este es un intervalo muy grande de tiempo y Guido sabe que sus superiores lo mirarán de mala manera si él informa ese lapso de tiempo, por lo que brinda a sus "ayudantes" un poco más de información para ver si se logra achicar el intervalo.
+Según la Figura 4, Sergio se habría muerto entre las 3:23hs y las 6:13hs.
 
-### Dos cabezas piensan mejor que una
-Ahora se conocen datos que fueron recabados entre las 7 y las 10 de la mañana y se suma una observación para actualizar el modelo: la segunda medición al cuerpo de Sergio (realizada a las 8:15hs) arrojó una temperatura corporal de 30.5°C.
+
+#### Dos observaciones
+
+Utilizando el modelo con las distribuciones a priori propuesto anteriormente (3) y la información disponible hasta las 10 de la mañana, se actualiza el modelo.
+Se cuenta entones con dos datos: la temperatura del cuerpo de Sergio a las 6:45hs, que fue de 32.8ºC y la temperatura del cuerpo de Sergio a las 8:15hs que fué de 30.5°C.
 
 ```{r, results='hide'}
 datos2 <- data.frame(
@@ -434,7 +460,8 @@ $$
 \beta_1 & -0.216 & 0.026 & 1.003 & 1908 \\
 \sigma & 0.231 & 0.253 & 1.0003 & 2493 \\
 \end{array}
-$$
+$$ 
+
 Nuevamente se obtienen buenos $\hat{R}$ para los 3 parámetros pero el número efectivo de muestras se ve disminuido en relación al apartado anterior ("Primer observación).
 
 ```{r, fig.height=4}
@@ -518,10 +545,14 @@ rectas_posterior2 <-
   geom_point(data=observaciones, aes(x=tiempo, y=exp(y)+22),
              size = 3, color = 'honeydew4') +
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
-  geom_vline(xintercept = lim_inf2) +
-  geom_vline(xintercept = lim_sup2) +
-  labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
- scale_x_continuous( breaks = seq(-4, 8, by = 2), labels = seq(2.45, 14.45, by = 2),expand = c(0, 0)) +
+  geom_vline(xintercept = lim_inf2, linetype = "dashed", color = "indianred1") +
+  geom_vline(xintercept = lim_sup2, linetype = "dashed", color = "indianred1") +
+  annotate("text", x = lim_inf2, y = 28, label = "x = 3.16", 
+           color = "black", vjust = -0.5, angle = 90) +
+  annotate("text", x = lim_sup2, y = 28, label = "x = 6.07", 
+           color = "black", vjust = -0.5, angle = 90) +
+    labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
+ scale_x_continuous( breaks = seq(-3.75, 7.75, by = 2), labels = seq(3,13, by = 2),expand = c(0, 0)) +
   theme_bw()
 
 rectas_posterior2
@@ -656,10 +687,14 @@ rectas_posterior3 <-
             alpha = 0.3, size = 1) +
   geom_hline(yintercept = 36.5, linetype = "dashed")  +
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
-  geom_vline(xintercept = lim_inf3) +
-  geom_vline(xintercept = lim_sup3) +
+  geom_vline(xintercept = lim_inf3, linetype = "dashed", color = "indianred1") +
+  geom_vline(xintercept = lim_sup3, linetype = "dashed", color = "indianred1") +
+  annotate("text", x = lim_inf3, y = 28, label = "x = 3.50", 
+           color = "black", vjust = -0.5, angle = 90) +
+  annotate("text", x = lim_sup3, y = 28, label = "x = 6.08", 
+           color = "black", vjust = -0.5, angle = 90) +
   labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
- scale_x_continuous( breaks = seq(-4, 8, by = 2), labels = seq(2.45, 14.45, by = 2),expand = c(0, 0)) +
+ scale_x_continuous( breaks = seq(-3.75, 7.75, by = 2), labels = seq(3,13, by = 2),expand = c(0, 0)) +
   theme_bw()
 
 rectas_posterior3
@@ -675,7 +710,8 @@ Las enfermedades crónicas aceleran el enfriamiento del cuerpo, mientras que otr
 
 [^3]: Fuente: [\textcolor{blue}{\underline{Fenómenos cadavéricos y el tanatocronodiagnóstico}}](chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.uv.es/gicf/3R1_Pen%CC%83a_GICF_31.pdf)
 
+Si Sergio hubiese tenido una enfermedad crónica al momento de su muerte, se deberían modificar las distribuciones a priori para $\beta_0$ y $\beta_1$ de modo que sus medias sean menores.
 
-Si Sergio hubiese tenido una enfermedad crónica al momento de su muerte, se deberían modificar las distribuciones a priori para $\beta_0$ y $\beta_1$ de modo que sus medias sean menores. 
-
-En caso de que el hombre haya tenido fiebre, también se deberían modificar los priors de $\beta_0$ y $\beta_1$. En el caso de $\beta_0$ hay que considerar que la temperatura del cuerpo al momento de la muerte ya no es la habitual del cuerpo humano(36.5ºC), sino que ronda los 38 y 39ºC. Luego, $\beta_1$ debería tener una media menor, para permitir que el descenso de la temperatura sea más rápido en las primeras horas postmortem.
+En caso de que el hombre haya tenido fiebre, también se deberían modificar los priors de $\beta_0$ y $\beta_1$.
+En el caso de $\beta_0$ hay que considerar que la temperatura del cuerpo al momento de la muerte ya no es la habitual del cuerpo humano(36.5ºC), sino que ronda los 38 y 39ºC.
+Luego, $\beta_1$ debería tener una media menor, para permitir que el descenso de la temperatura sea más rápido en las primeras horas postmortem.
