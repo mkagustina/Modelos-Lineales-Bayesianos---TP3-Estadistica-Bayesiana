@@ -1,0 +1,21 @@
+---
+title: "Modelo con t delta"
+author: "Agustina"
+date: '2024-06-03'
+output: pdf_document
+---
+
+## Acá pongo todo lo que hicimos sobre el modelo con $t_\delta$
+
+Los priors son los siguientes:
+
+$t_{\delta}$ es el tiempo en el que se murió Sergio (hora de muerte). Dado que los ruidos se escuchan a las 5:33hs y a las 6:00hs se constata la presencia de un cuerpo inherte, se supone que Sergio muere entre las 5 y las 6 hs.
+
+$$
+\begin{cases}
+\beta_0 \sim N_{(2,705, 0.012)} \\
+\beta_1 \sim N_{(-0.15, 0.017)} \\
+\sigma \sim N^{+}_{(5,17)} \\
+t_{\delta} \sim N_{(-1.25, 0.17)}
+\end{cases}
+$$
