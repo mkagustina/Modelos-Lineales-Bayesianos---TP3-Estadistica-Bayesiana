@@ -14,9 +14,10 @@ title: |
   \\
   {\Large Estadística Bayesiana - Trabajo Práctico Nº3}\\
   \end{tabular}
-  \vspace{4cm}
+  \vspace{2cm}
   \begin{flushright}
-    \includegraphics[width=4cm]{chuky.png}
+    \includegraphics[width=2cm]{chuky.png}
+  \end{flushright}
 author: |
   Alumnas: Agustina Mac Kay, Ailén Salas y Rocío Canteros ayudando a Guido el cordobés
 date: "Año 2024"
@@ -46,15 +47,15 @@ set.seed(425641446)
 
 ## Introducción
 
-Guido es un estudiante de estadística que, por ser fanático de CSI: Crime Scene Investigations hoy cumple su sueño formando parte de la policía científica de Córdoba. Pero no todo es color de rosas. En realidad, Guido está viviendo una pesadilla traumática desde la madrugada del pasado miércoles cuando, su unidad de Salsipuedes fue convocada para investigar un crimen que, aparentemente, había sido recién cometido. 
+Guido es un estudiante de estadística que, por ser fanático de CSI: Crime Scene Investigations hoy cumple su sueño formando parte de la policía científica de Córdoba. Pero no todo es color de rosa. En realidad, Guido está viviendo una pesadilla traumática desde la madrugada del pasado miércoles, cuando su unidad de Salsipuedes fue convocada para investigar un crimen que, aparentemente, acababa de ser cometido. 
 
-Al llegar al lugar, el caos se extendía por toda la habitación. Muebles volcados y destrozados. Utensilios de cocina desparramados y manchados con sangre. Vidrios estallados. Manchas de sangre en las paredes y en el piso. Guido se encontraba paralizado. Su respiración era agitada y sus manos transpiraban. Cuando creía que esta era la peor película de terror de su vida.. Ahí estaba, el cuerpo de Sergio Contreras ahogándose en un charco de sangre. 
+Al llegar al lugar, el caos se extendía por toda la habitación. Muebles volcados y destrozados, utensilios de cocina desparramados y manchados con sangre, vidrios estallados y manchas de sangre en las paredes y en el piso. Guido se encontraba paralizado. Su respiración era agitada y sus manos transpiraban. Cuando creía que esta era la peor película de terror de su vida.. Ahí estaba, el cuerpo de Sergio Contreras ahogándose en un charco de sangre. 
 
-Desde entonces el pobre Guido entró en shock. Su psicóloga le dijo que perdió sus conocimientos de estadística por el shock y que cuando pase, le volverán. Mientras tanto, dado que no estamos tan involucradas como él y que por suerte no perdimos nuestros conocimientos estadísticos nos pidió ayuda para resolver el caso. Para que Guido no pierda su trabajo nos ponemos muy serias.
+En ese momento Guido entró en shock. Su psicóloga le dijo que por ello perdió sus conocimientos de estadística, pero que con el tiempo volverán. Mientras tanto, dado que por suerte nosotras no perdimos nuestros conocimientos estadísticos, el cordobés nos pidió ayuda para resolver el caso. Para que Guido no pierda su trabajo, nos ponemos más serias.
 
 ## Objetivo 
 
-El objetivo de este trabajo es averiguar la hora de muerte de Sergio Contreras, quien murió desangrado, producto de una herida punzante recibida en el bRazo, en su casa en la localidad cordobesa de Salsipuedes.
+El objetivo de este trabajo es averiguar la hora de muerte de Sergio Contreras, quien murió desangrado, producto de una herida punzante recibida en el bazo, en su casa en la localidad cordobesa de Salsipuedes.
 
 ## Metodología
 
@@ -64,16 +65,14 @@ La tanatocronología, derivada de las palabras griegas "thanatos" (muerte) y "ch
 
 Desde el momento de la muerte, comienza en el cuerpo humano una serie de procesos químicos y físicos que se conocen como fenómenos cadavéricos.
 Uno de ellos es el enfriamiento del cuerpo (enfriamiento postmortem o *algor mortis*).
-En este proceso, la temperatura del cadáver desciende hasta igualarse con la temperatura ambiente.
-Este descenso ocurre más rápido en las primeras horas después de la muerte.
-Esto último es explicado a través de la Ley de enfriamiento de Newton, que explica cómo la temperatura de un objeto (en este caso, un cadáver) cambia con el tiempo en relación con la temperatura del entorno.
 
+En este proceso, la temperatura del cadáver desciende hasta igualarse con la temperatura ambiente, y este descenso ocurre más rápido en las primeras horas después de la muerte.
 
+\newpage
 
 ##  Resumen de los hechos ocurridos
 
-Para resolver esto, se tiene la siguiente cronología:
-
+Para resolver la interrogante de este trabajo, se cuenta con la siguiente cronología de hechos:
 
 ```{r, echo=FALSE, out.width='50%', fig.align='center'}
 knitr::include_graphics('cronologia.jpg')
@@ -85,36 +84,34 @@ La Ley de enfriamiento de Newton establece que la tasa de cambio de la temperatu
 
 Esta Ley se puede expresar matemáticamente como:
 
-$$\frac{dT(t)}{dt}=r[T_{amb}-T(T)]\tag{1}$$
+$$\frac{dT(t)}{dt}=r[T_{\mathrm{amb}}-T(t)]\tag{1}$$
 
-donde   
-$T(t)$ es la temperatura del cuerpo en el tiempo $t$.
+donde $T(t)$ es la temperatura del cuerpo en el tiempo $t$, $T_{amb}$ es la temperatura ambiente y $r$ es una constante de proporcionalidad que depende de las características del cadáver y del ambiente.
 
-$T_{amb}$ es la temperatura ambiente.
+Una posible solución a esta ecuación viene dada por:
 
-$r$ es una constante de proporcionalidad que depende de las características del cadáver y del ambiente.
-
-Una posible solución de la ecuación diferencial da la temperatura del cadáver en función del tiempo viene dada por:
-
-$$T(t)=T_{amb}+(T_i-T_{amb})e^{-kt}$$
+$$T(t)=T_{\mathrm{amb}}+(T_i-T_{\mathrm{amb}})e^{-kt}$$
 donde
-$T_i$ es la temperatura inicial del cadáver (en el momento de la muerte).
+$T_i$ es la temperatura inicial del cadáver.
 
 La misma satisface la ecuación $(1)$ ya que: 
 
-$$ \frac{dT(t)}{dt} = (T_i - T_{\text{amb}}) \cdot (-r) \cdot e^{-rt} $$
-$$ = -r \cdot [(T_i - T_{\mathrm{amb}}) \cdot e^{-rt}] $$
-$$ = -r \cdot [-T_{\mathrm{amb}}+T_{\mathrm{amb}}+(T_i - T_{\mathrm{amb}}) \cdot e^{-rt}] $$
-$$ = -r \cdot [-T_{\mathrm{amb}}+T(t)]$$
-$$ = r \cdot [T_{\mathrm{amb}} - T(t)] $$
+\begin{align*}
+\frac{dT(t)}{dt} &= (T_i - T_{\text{amb}}) \cdot (-r) \cdot e^{-rt} \\
+&= -r \cdot [(T_i - T_{\mathrm{amb}}) \cdot e^{-rt}] \\
+&= -r \cdot [-T_{\mathrm{amb}} + T_{\mathrm{amb}} + (T_i - T_{\mathrm{amb}}) \cdot e^{-rt}] \\
+&= -r \cdot [-T_{\mathrm{amb}} + T(t)] \\
+&= r \cdot [T_{\mathrm{amb}} - T(t)]
+\end{align*}
+
 Con el objetivo de obtener un valor realista de $r$, se grafica la función $T(t)$ con distintos valores de esta constante. Para esto, se considera una temperatura inicial del cuerpo de 37 Cº y una temperatura ambiente de 23 Cº.
 
-```{r, warning=FALSE, message=FALSE, fig.align='center'}
+```{r, fig.align='center'}
 # Gráfico de la temperatura del cuerpo a través del tiempo
 t_amb <- 23
 t_i <- 37
 t <- seq(0, 35, by = 1)
-r <- c(0.1, 0.3)
+r <- c(0.1, 0.2, 0.3)
 
 funcion_t <- function(t_amb, t_i, t, r) {
   t_amb + (t_i- t_amb) * exp(-r*t)
@@ -136,16 +133,14 @@ ggplot(df_T) +
   geom_line(aes(x = t, y = func_t, color = factor(r)), linewidth = 1) +
   scale_x_continuous(breaks = seq(0, 40, by = 5), name = "Hora (t)") +
   scale_y_continuous(breaks = seq(23, 39, by = 2), name = "T(t)") +
-  scale_color_manual(values = c("orchid3", "palegreen3", 'hotpink', 'gold3', 'firebrick3'), name = "r") +
+  scale_color_manual(values = c("orchid3", "palegreen3", 'gold'), name = "r") +
   geom_hline(yintercept = 23, linetype = "dashed") +
-  labs(caption = "Figura 1: Gráfica de la función de descenso de la temperatura corporal T(t) para 2 valores de la constante r,\n con una temperatura inicial del cuerpo de 37 Cº hasta alcanzar una temperatura ambiente de 23 Cº") +
+  labs(caption = "Figura 1: Gráfica de la función de descenso de la temperatura corporal T(t) para 3 valores de la constante r,\n con una temperatura inicial del cuerpo de 37 Cº hasta alcanzar una temperatura ambiente de 23 Cº") +
   theme_bw() +
   theme(plot.caption = element_text(hjust = 0.5))
 ```
 
-Como se mencionó anteriormente, *r* es una constante de proporcionalidad que depende de las características del cadáver y del ambiente. Ésta, representa la conductividad entre el cuerpo y la/s superficie/s de contacto.
-
-A valores más altos de *r*, más rápido será el descenso de la temperatura corporal.
+Como se mencionó anteriormente, *r* es una constante de proporcionalidad que depende de las características del cadáver y del ambiente. Ésta, representa la conductividad entre el cuerpo y la superficie de contacto. A valores más altos de *r*, más rápido será el descenso de la temperatura corporal.
 
 Los órganos abdominales pueden mantener el calor por al menos 24 horas.
 En las primeras 12 horas se va perdiendo el calor de 0.8 a 1.0 °C por hora y en las siguientes 12 horas de 0.3 a 0.5 grados centígrados.[^2]
@@ -154,24 +149,26 @@ En las primeras 12 horas se va perdiendo el calor de 0.8 a 1.0 °C por hora y en
 
 Sin embargo, el cuerpo de Sergio no está sufriendo un enfriamiento postmortem regular, puesto que falleció desangrado. La sangre retiene calor y distribuye la temperatura uniformemente en el cuerpo. Sin sangre, el cuerpo pierde calor más rápidamente. Esto podría llevar a pensar que la constante de proporcionalidad sea un poco más alta que en una situación de muerte por causa natural.
 
-Teniendo en cuenta esta información y lo observado en la Figura 1, se puede considerar que un valor razonable para *r* se encuentra entre 0.1 y 0.2.
+Teniendo en cuenta esta información y lo observado en la Figura 1, se puede considerar que un valor razonable para *r* se encuentra entre 0.1 y 0.3.
 
 ### Postulación del modelo
 
-Para mayor simplicidad a la hora de construír un modelo, en lugar de trabajar con la temperatura del cuerpo se decide utilizar la diferencia entre la temperatura del mismo y la temperatura ambiente $T(t) - T_{\mathrm{amb}}$.
+Para mayor simplicidad a la hora de construir un modelo, en lugar de trabajar con la temperatura del cuerpo se decide utilizar la diferencia entre la temperatura del mismo y la temperatura ambiente $T(t) - T_{\mathrm{amb}}$.
 Además, se define $T_{\mathrm{diff}} = T_i - T_{\mathrm{amb}}$; por lo que se obtiene finalmente que $T(t) - T_{\mathrm{amb}} = T_{\mathrm{diff}} \cdot e ^ {-rt}$.
 
 Se demuestra a continuación un resultado que será de vital importancia para la construcción de un modelo: el logaritmo natural de la nueva variable $T(t) - T_{\mathrm{amb}}$ es una función lineal de *t*.
 
 $$ \ln(T(t) - T_{\mathrm{amb}}) = \ln( T_{\mathrm{diff}} \cdot e^{-rt}) = \ln(T_{\mathrm{diff}}) + (-rt) \cdot \ln (e) = \ln(T_{\mathrm{diff}}) - rt = \beta_{0} + \beta_{1}\cdot t \tag{2}$$
 
-Se toma como momento 0 al tiempo en el que ocurre la primer medición de temperatura del cuerpo. 
-De esta manera, se puede interpretar a $\beta_{0}$ como el valor del $\ln(T(t) - T_{\mathrm{amb}})$ cuando $t=0$.
-Al exponenciar ambos miembros se obtiene que $$ T(t=0) - T_{\mathrm{amb}} = e^{\beta_0}$$ Si se toma como tiempo cero el momento de la primera medición (las 6:45hs), entonces la temperatura del cuerpo en ese momento es igual a $e^{\beta_0} + T_{\mathrm{amb}}$
+Dado que se desconoce la hora de muerte de Sergio, se toma como momento 0 al tiempo en el que ocurre la primer medición de temperatura al cuerpo. 
+
+De esta manera, se puede interpretar a $\beta_{0}$ como el valor del $\ln(T(t) - T_{\mathrm{amb}})$ al momento de la primer medición, es decir, cuando $t=0$. Al exponenciar ambos miembros se obtiene que 
+$$ T(t=0) - T_{\mathrm{amb}} = e^{\beta_0}$$
+Por lo que la temperatura del cuerpo a las 6:45hs (hora de la primer medición) es igual a $e^{\beta_0} + T_{\mathrm{amb}}$
 
 $\beta_1$ es el opuesto de la constante de conductividad y representa el cambio en el logaritmo de la diferencia entre la temperatura corporal y la temperatura ambiente por cada hora transcurrida.
 
-Para determinar la hora de muerte de Sergio, se trabajará con un modelo lineal bayesiano; se determinarán creencias a priori para los parámetros desconocidos para luego actualizarlas con las mediciones de temperatura que se realizaron al cuerpo del hombre.
+Para determinar la hora de muerte de Sergio, se trabajará con un modelo lineal bayesiano; se determinarán creencias a priori para los parámetros desconocidos para luego actualizarlas con las mediciones de \mbox{temperatura} que se realizaron al cuerpo del hombre.
 Para este proceso, se considera que la temperatura ambiente (constante a través del tiempo) es de 22ºC.
 
 El modelo propuesto incompleto, dado que faltan las distribuciónes a priori de sus parámetros, es el siguiente:
@@ -216,7 +213,7 @@ $$
 \end{cases}
 $$ Se realizan pruebas predictivas a priori para este modelo.
 
-```{r, warning=FALSE, message=FALSE}
+```{r}
 mu_b0 <- 2.333
 sigma_b0 <- 0.064
 mu_b1 <- -0.225
@@ -235,10 +232,9 @@ parametros <-
 
 rectas_prior <- 
   ggplot(data = observaciones) +
-  geom_point(aes(x=tiempo, y=y), size = 3) +
   geom_abline(data = parametros %>%
   slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
-  # lims(x=c(-2,7),y=c(0.4,3)) +
+  geom_point(aes(x=tiempo, y=y), size = 3, color = 'honeydew4') +
   lims ( x= c(-3,7.5),y=c(0.5,4)) +
   theme_bw() +
   labs(caption = 'Figura 2: rectas predictivas a priori')+
@@ -256,7 +252,7 @@ Esto puede deberse a que, si bien se probó que el logaritmo natural $T(t) - T_{
 
 Utilizando la información disponible hasta las 7 de la mañana, se actualiza el modelo. Se cuenta únicamente con un solo dato: la temperatura del cuerpo de Sergio en la primer medición (6:45hs) fue de 32.8ºC.
 
-```{r, warning=FALSE, results='hide', message=FALSE}
+```{r, results='hide'}
 # Modelo actualizado con 1 sola observación
 datos1 <- data.frame(
   t = c(0),
@@ -297,10 +293,10 @@ $$
 \sigma & 0.343 & 0.383 & 1.0005 & 3919 \\
 \end{array}
 $$ 
+
 Los 3 parámetros tienen buen $\hat{R}$ y un número efectivo de muestras muy alto. Además, se aprecia en la Figura 3 que las cadenas, en cada trace plot, se mezclan entre si indicando que son similares y recorren bien la distribución establecida para los parámetros.
 
-
-```{r, message=FALSE, warning=FALSE, fig.width=7}
+```{r, fig.height = 4}
 # Evaluamos la calidad de las muestras
 mcmc_trace(
   stan_model1, 
@@ -308,9 +304,8 @@ mcmc_trace(
   facet_args = list(nrow = 3), 
 ) +
   labs(caption = "Figura 3: Trace plot por parámetro") +
+  theme_bw() +
   theme(plot.caption = element_text(hjust = 0.5))
-
-
 ```
 
 Por lo que, considerando solo 1 observación, el modelo se renueva y queda definido de la siguiente manera:
@@ -325,7 +320,9 @@ $$
 \sigma \sim \mathcal{N}^{+}_{(0.383)}
 \end{cases}
 $$
+
 Con él (el modelo) se realizan curvas *a posteriori* para poder dar una primera aproximación sobre la hora de muerte de Sergio.
+
 ```{r}
 # Primera observacion
 datos_transf1 <- data.frame(
@@ -382,7 +379,8 @@ rectas_posterior1 <-
             mapping = aes(x = t, y = T_t,group = interaction(b0, b1)),
             alpha = 0.3, size = 1) +
   geom_hline(yintercept = 36.5, linetype = "dashed")  +
-  geom_point(data=observaciones, aes(x=tiempo, y=exp(y)+22), size = 3) +
+  geom_point(data=observaciones, aes(x=tiempo, y=exp(y)+22),
+             size = 3, color = 'honeydew4') +
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
   geom_vline(xintercept = lim_inf1, linetype = "dashed", color = "indianred1") +
   geom_vline(xintercept = lim_sup1, linetype = "dashed", color = "indianred1") +
@@ -391,11 +389,10 @@ rectas_posterior1 <-
   theme_bw() +
   theme(plot.caption = element_text(hjust = 0.5))
 
-
 rectas_posterior1
 ```
-Según la Figura 4, Sergio se habría muerto entre aproximadamente las 3:45hs y las 6:00hs. Este es un intervalo muy grande de tiempo y Guido sabe que sus superiores lo mirarán de mala manera si él informa ese lapso de tiempo, por lo que brinda a sus "ayudantes" un poco más de información para ver si se logra achicar el intervalo.
 
+Según la Figura 4, Sergio se habría muerto entre aproximadamente las 3:45hs y las 6:00hs. Este es un intervalo muy grande de tiempo y Guido sabe que sus superiores lo mirarán de mala manera si él informa ese lapso de tiempo, por lo que brinda a sus "ayudantes" un poco más de información para ver si se logra achicar el intervalo.
 
 ### Dos cabezas piensan mejor que una
 Ahora se conocen datos que fueron recabados entre las 7 y las 10 de la mañana y se suma una observación para actualizar el modelo: la segunda medición al cuerpo de Sergio (realizada a las 8:15hs) arrojó una temperatura corporal de 30.5°C.
@@ -440,13 +437,14 @@ $$
 $$
 Nuevamente se obtienen buenos $\hat{R}$ para los 3 parámetros pero el número efectivo de muestras se ve disminuido en relación al apartado anterior ("Primer observación).
 
-```{r, eval=FALSE}
+```{r, fig.height=4}
 mcmc_trace(
   stan_model2, 
   pars = c("beta0", "beta1", "sigma"),
   facet_args = list(nrow = 3)
 ) +
   labs(caption = "Figura 5: Trace plot por parámetro -Modelo n°2-") +
+  theme_bw() +
   theme(plot.caption = element_text(hjust = 0.5))
 ```
 
@@ -517,7 +515,8 @@ rectas_posterior2 <-
             mapping = aes(x = t, y = T_t,group = interaction(b0, b1)),
             alpha = 0.3, size = 1) +
   geom_hline(yintercept = 36.5, linetype = "dashed")  +
-  geom_point(data=observaciones, aes(x=tiempo, y=exp(y)+22), size = 3) +
+  geom_point(data=observaciones, aes(x=tiempo, y=exp(y)+22),
+             size = 3, color = 'honeydew4') +
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
   geom_vline(xintercept = lim_inf2) +
   geom_vline(xintercept = lim_sup2) +
@@ -576,12 +575,15 @@ $$
 
 Los $\hat{R}$ son todos buenos y los números efectivos de muestras también.
 
-```{r, eval=FALSE}
+```{r, fig.height=4}
 mcmc_trace(
   stan_model3, 
   pars = c("beta0", "beta1", "sigma"),
   facet_args = list(nrow = 3)
-)
+) +
+  labs(caption = "Figura 7: Trace plot por parámetro -Modelo n°3-") +
+  theme_bw() +
+  theme(plot.caption = element_text(hjust = 0.5))
 ```
 
 todas mezcladas.
