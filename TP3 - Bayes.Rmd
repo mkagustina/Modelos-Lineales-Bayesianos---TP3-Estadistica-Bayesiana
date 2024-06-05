@@ -38,6 +38,8 @@ library(kableExtra)
 library(rstan)
 library(bayesplot)
 library(tidyr)
+
+set.seed(425641446)
 ```
 ## Introducción
 
@@ -202,14 +204,13 @@ rectas_prior <-
   slice_sample(n = 50, weight_by = prior), mapping = aes(slope=b1, intercept=b0),alpha = 0.3, size = 1) +
   # lims(x=c(-2,7),y=c(0.4,3)) +
   lims ( x= c(-3,7.5),y=c(0.5,4)) +
-  theme_bw() 
-# +
-#   labs(caption = 'Figura 2: rectas predictivas a priori')
+  theme_bw() +
+  labs(caption = 'Figura 2: rectas predictivas a priori')
 
 rectas_prior
 ```
 
-Se puede ver que el prior no es tan compatible con las observaciones. La pendiente parece estar bien, pero el $\beta_0$ es muy alto.
+Podemos ver que el prior es bastante compatible con las observaciones. También notamos que los 3 puntos no están alineados. Esto puede deberse a que, si bien probamos que el logaritmo natural $T(t) - T_{\mathrm{amb}}$ es una función lineal de *t*, estamos suponiendo que la temperatura ambiente es fija cuando la última medición se realizó habiendo trasladado el cuerpo, por lo que sería raro que la temperatura ambiente realmente se mantenga.
 
 ## Primer observación
 
@@ -296,20 +297,47 @@ dv1 <-
   mutate(posterior = likelihood*prior) %>%
   select(-datos_transf1)
 
-rectas_posterior <-
-  ggplot(observaciones) +
-  geom_point(aes(x=tiempo, y=y), size = 3) +
-  geom_abline(data = dv1 %>%
-  slice_sample(n = 50, weight_by = posterior), mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) + 
-   geom_point(data = observaciones %>% slice(1), aes(x=tiempo, y=y), size=4, color = "firebrick3") +
-  lims ( x= c(-3,7.5),y=c(0.5,4)) +
-  theme_bw() +
-  geom_hline(yintercept = log(37-22), linetype = "dashed") +
-  geom_vline(xintercept = -0.3) +
-  geom_vline(xintercept = 0.3)
+# Obtenemos las rectas muestreadas de b0 y b1
+muestra1 <- dv1 %>% 
+  slice_sample(n = 50, weight_by = posterior)
 
-rectas_posterior
-  
+# Obtenemos el intervalo de la muerte de Sergio
+y_objetivo <- log(36.5-22)
+intercepto_rectas1 <- data.frame(b0 = muestra1$b0, b1=muestra1$b1)
+intercepto_rectas1 <-  intercepto_rectas1 %>%
+  mutate(t = (y_objetivo - b0)/b1)
+lim_inf1 <- min(intercepto_rectas1$t)
+lim_sup1 <- max(intercepto_rectas1$t)
+
+# Función para convertir las rectas en curvas, transformando la variable Y
+generacion_datos_curvas <- function(b0, b1) {
+  data.frame(
+    t = seq(-4, 8, by = 0.1),
+    T_t = 22 + exp(b0 + b1 * seq(-4, 8, by = 0.1))
+  )
+}
+
+# Creamos un data frame con todas las curvas
+datos_curvas1 <- muestra1 %>%
+  group_by(b0, b1) %>%
+  do(generacion_datos_curvas(.$b0, .$b1))
+
+# Graficamos las observaciones y las curvas
+rectas_posterior1 <-
+  ggplot(datos1) +
+  geom_line(data = datos_curvas1,
+            mapping = aes(x = t, y = T_t,group = interaction(b0, b1)),
+            alpha = 0.3, size = 1) +
+  geom_hline(yintercept = 36.5, linetype = "dashed")  +
+  geom_point(data=observaciones, aes(x=tiempo, y=y), size = 3) +
+  geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
+  geom_vline(xintercept = -2.863) +
+  geom_vline(xintercept = -0.502) +
+  labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
+  scale_x_continuous(expand = c(0,0)) +
+  theme_bw()
+
+rectas_posterior1
 ```
 
 Según este nuevo modelo, Serio murió entre el tiempo -0.3 y 0.3. Malísimo.
@@ -391,16 +419,44 @@ dv2 <-
   mutate(posterior = likelihood*prior) %>%
   select(-datos_transf2) 
 
+# Obtenemos las rectas muestreadas de b0 y b1
+muestra2 <- dv2 %>% 
+  slice_sample(n = 50, weight_by = posterior)
+
+# Obtenemos el intervalo de la muerte de Sergio
+y_objetivo <- log(36.5-22)
+intercepto_rectas2 <- data.frame(b0 = muestra2$b0, b1=muestra2$b1)
+intercepto_rectas2 <-  intercepto_rectas2 %>%
+  mutate(t = (y_objetivo - b0)/b1)
+lim_inf2 <- min(intercepto_rectas2$t)
+lim_sup2 <- max(intercepto_rectas2$t)
+
+# Función para convertir las rectas en curvas, transformando la variable Y
+generacion_datos_curvas <- function(b0, b1) {
+  data.frame(
+    t = seq(-4, 8, by = 0.1),
+    T_t = 22 + exp(b0 + b1 * seq(-4, 8, by = 0.1))
+  )
+}
+
+# Creamos un data frame con todas las curvas
+datos_curvas2 <- muestra2 %>%
+  group_by(b0, b1) %>%
+  do(generacion_datos_curvas(.$b0, .$b1))
+
+# Graficamos las observaciones y las curvas
 rectas_posterior2 <-
-  ggplot(observaciones) +
-  geom_abline(data = dv2 %>%
-  slice_sample(n = 50, weight_by = posterior), mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) +
-   geom_point(aes(x=tiempo, y=y), size = 3) +
-  geom_point(data = observaciones %>% slice(1:2), aes(x=tiempo, y=y), size=4, color = "firebrick3") +
-  lims ( x= c(-3,7.5),y=c(0.5,4)) +
-  theme_bw()+
-  geom_hline(yintercept = log(37-22), linetype = "dashed")  +
-  geom_vline(xintercept = 0)
+  ggplot(datos2) +
+  geom_line(data = datos_curvas2,
+            mapping = aes(x = t, y = T_t,group = interaction(b0, b1)),
+            alpha = 0.3, size = 1) +
+  geom_hline(yintercept = 36.5, linetype = "dashed")  +
+  geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
+  geom_vline(xintercept = -2.863) +
+  geom_vline(xintercept = -0.502) +
+  labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
+  scale_x_continuous(expand = c(0,0)) +
+  theme_bw()
 
 rectas_posterior2
 ```
@@ -478,12 +534,17 @@ dv3 <-
   slice(c(1,2,3)) %>%
   tidyr::crossing(parametros) %>% 
   nest(datos_transf3 = c(t,temp)) %>%
-  mutate(likelihood = purrr::pmap_dbl(list(datos = datos_transf3, b0 = parametros$b0, b1 = parametros$b1, sd = 0.6),
-                                      calc_likelihood)) %>%
+  mutate(likelihood = purrr::pmap_dbl(
+    list(datos = datos_transf3, b0 = parametros$b0, b1 = parametros$b1,
+         sd = 0.6),calc_likelihood)) %>%
   mutate(posterior = likelihood*prior) %>%
   select(-datos_transf3) 
 
-muestra3 <- dv3 %>% slice_sample(n = 50, weight_by = posterior)
+# Obtenemos las rectas muestreadas de b0 y b1
+muestra3 <- dv3 %>% 
+  slice_sample(n = 50, weight_by = posterior)
+
+# Obtenemos el intervalo de la muerte de Sergio
 y_objetivo <- log(36.5-22)
 intercepto_rectas <- data.frame(b0 = muestra3$b0, b1=muestra3$b1)
 intercepto_rectas <-  intercepto_rectas %>%
@@ -491,47 +552,35 @@ intercepto_rectas <-  intercepto_rectas %>%
 lim_inf3 <- min(intercepto_rectas$t)
 lim_sup3 <- max(intercepto_rectas$t)
 
-generate_curve_data <- function(b0, b1, T_amb = 22, t_range = seq(-3.5, 8, by = 0.1)) {
+# Función para convertir las rectas en curvas, transformando la variable Y
+generacion_datos_curvas <- function(b0, b1) {
   data.frame(
-    t = t_range,
-    T_t = T_amb + exp(b0 + b1 * t_range)
+    t = seq(-4, 8, by = 0.1),
+    T_t = 22 + exp(b0 + b1 * seq(-4, 8, by = 0.1))
   )
 }
 
-# Crear un data frame con todas las curvas
-curves_data <- muestra3 %>%
+# Creamos un data frame con todas las curvas
+datos_curvas3 <- muestra3 %>%
   group_by(b0, b1) %>%
-  do(generate_curve_data(.$b0, .$b1))
+  do(generacion_datos_curvas(.$b0, .$b1))
 
-# Graficar las observaciones y las curvas
+# Graficamos las observaciones y las curvas
 rectas_posterior3 <-
   ggplot(datos3) +
-  geom_line(data = curves_data, mapping = aes(x = t, y = T_t, group = interaction(b0, b1)), alpha = 0.3, size = 1) +
-  # Ajustar el límite superior de y según sea necesario
+  geom_line(data = datos_curvas3,
+            mapping = aes(x = t, y = T_t,group = interaction(b0, b1)),
+            alpha = 0.3, size = 1) +
+  geom_hline(yintercept = 36.5, linetype = "dashed")  +
   geom_point(aes(x = t, y = temp), size = 4, color = "firebrick3") +
+  geom_vline(xintercept = -3.4149) +
+  geom_vline(xintercept = -0.706) +
+  labs(x="Tiempo en horas",y="T(t)", caption = "figura xxxxxxxxxx")+
+  scale_x_continuous(expand = c(0,0)) +
   theme_bw()
 
 rectas_posterior3
-  
-# rectas_posterior3 <-
-#   ggplot(observaciones) +
-#   geom_point(aes(x=tiempo, y=y), size=4, color = "firebrick3") +
-#   geom_abline(data = muestra3, mapping = aes(slope=b1, intercept=b0), alpha = 0.3, size = 1) +
-#   lims ( x= c(-3.5,7.5),y=c(0.5,4)) +
-#   theme_bw()
-# +
-  # geom_hline(yintercept = log(36.5-22), linetype = "dashed")  +
-  # geom_vline(xintercept = -3.16)+
-  # geom_vline(xintercept = -0.62)
 ```
 
-Sergio se murió aprox entre...
+Sergio se murió...
 
-## Cosas que no entiendo y me da cosa borrar
-
-
-cuerpo en la heladera por eso outlier
-
-
-
-Teniendo en cuenta la información cronológica presentada al inicio del trabajo, se presenta la tabla 1 (por ponerle un número). Se considera como $t = 0$ al horario en el que se le registra la temperatura por primera vez al cuerpo de Sergio (6:45hs), mientras que los demás tiempos son la diferencia, en minutos, entre esa hora y la hora en la que se tomán las restantes temperaturas (8:15hs y 13:30hs).
