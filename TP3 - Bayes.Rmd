@@ -604,8 +604,7 @@ stan_model3 <- stan(
   data = stan_data3,
   refresh = 1,
   seed = 20000,
-  iter = 2500, #3000
-  warmup = 1500, #1000
+  iter = 3000,
   control = list(adapt_delta = 0.95)
 )
 
@@ -616,9 +615,9 @@ $$
 \begin{array}{c|cc|cc}
 \text{Parámetro} &\text{Media} &\text{desvío} & \hat{R} & \text{Número efectivo de muestras} \\
 \hline
-\beta_0 & 2.338 & 0.06 & 1.0004 & 2552 \\
-\beta_1 & -0.238 & 0.022 & 1.001 & 2241 \\
-\sigma & 0.287 & 0.21 & 1.004 & 1547 \\
+\beta_0 & 2.337 & 0.059 & 1.0000 & 4067 \\
+\beta_1 & -0.238 & 0.022 & 1.0005 & 3409 \\
+\sigma & 0.287 & 0.201 & 1.0016 & 2586 \\
 \end{array}
 $$
 La muestra adquirida resulta buena ya que los valores de $\hat{R}$ obtenidos comunican que las cadenas convergieron por tercera vez. Esto acompaña a la Figura 7, la cual muestra, al igual que los casos previos, que estas se mezclan bien entre si representando la baja variabilidad que hay entre ellas y que recorren de manera adecuada la distribucion *a priori* de los 3 parámetros.
@@ -654,9 +653,9 @@ $$
 \ln(T(t) - T_{\mathrm{amb}}) \sim\mathcal{N}_{(\mu, \sigma)} \\
 \mu = \beta_{0} + \beta_{1}\cdot t \\
 \\
-\beta_0 \sim \mathcal{N}_{(2.338, 0.06)} \\
+\beta_0 \sim \mathcal{N}_{(2.337, 0.059)} \\
 \beta_1 \sim \mathcal{N}_{(-0.238, 0.022)} \\
-\sigma \sim \mathcal{N}^{+}_{(0.21)}
+\sigma \sim \mathcal{N}^{+}_{(0.201)}
 \end{cases}
 $$
 
